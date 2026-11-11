@@ -224,6 +224,7 @@ Untuk menjaga integritas relasional (*Foreign Key* antar domain) tanpa menciptak
 
 #### 2. Skema `academic_lms`
 - `academic_periods`, `classrooms`, `classroom_members`, `subjects`: Master struktur tahun ajaran, kelas, penempatan siswa, dan kurikulum.
+- `ppdb_applications` *(Ditulis oleh Node.js — `007_ppdb_applications.sql`)*: `id` (UUID, PK), `registration_number` (Unique), `academic_period_id` (FK), `student_id` (FK Unique → `iam_master.students.id`), `admission_track` (`ZONASI`, `PRESTASI`, `AFIRMASI`, `MUTASI`, `REGULER`), `documents_jsonb` (JSONB referensi MinIO `ppdb-docs`), `verification_status` (`DRAFT`, `SUBMITTED`, `VERIFIED`, `REJECTED`, `ACCEPTED`, `MIGRATED`), `invoice_id` (FK), `migrated_at`.
 - `schedules` *(Ditulis oleh Python OR-Tools & disesuaikan Node.js)*: `id` (UUID, PK), `academic_period_id` (FK), `classroom_id` (FK), `subject_id` (FK), `teacher_id` (FK), `room_code`, `day_of_week`, `start_time`, `end_time`.
 - `teaching_journals`: Jurnal harian mengajar guru dari Teacher App (`teacher_id`, `schedule_id`, `topic`, `notes`, `logged_at`).
 - `grades` & `e_rapor_documents`: Nilai akhir per kompetensi, deskripsi capaian, serta `tte_signed_pdf_url` (tautan PDF E-Rapor di MinIO yang sudah ber-TTE).
@@ -367,14 +368,20 @@ Seluruh layanan dikemas menggunakan **Docker** (multi-stage build):
 
 ### 8.2 Strategi Repository & CI/CD
 - **Struktur Monorepo Terorganisir** (memudahkan sinkronisasi kontrak antar bahasa):
-  - `apps/web-portal` (React + Vite)
-  - `apps/mobile-flutter` (Multi-flavor Flutter)
-  - `services/core-erp` (Node.js / NestJS)
-  - `services/high-speed-engine` (Rust / Axum)
-  - `services/ai-scheduling` (Python / FastAPI)
+  - `docker-compose.yml`, `Makefile`, `.env.example`, `README.md` (di root monorepo untuk orkestrasi lokal & perintah standar)
+  - `apps/web-portal` (React + Vite + TypeScript)
+  - `apps/mobile-flutter` (Multi-flavor Flutter: Parent, Student, Teacher)
+  - `services/core-erp` (Service A: Node.js / NestJS)
+  - `services/high-speed-engine` (Service B: Rust / Axum)
+  - `services/ai-scheduling` (Service C: Python / FastAPI)
   - `firmware/iot-terminals` (ESP32 / RPi)
-  - `infra/` (Migrations SQL terpusat, Docker Compose, Helm/K8s manifests, Kong config)
+  - `infra/`
+    - `infra/migrations/` (Single Migration Authority SQL: `001`–`007+` untuk 4 skema PostgreSQL)
+    - `infra/gateway/` (Konfigurasi Nginx / Kong API Gateway)
+    - `infra/scripts/` (Utility script, termasuk generator keypair JWT `RS256`)
+    - `infra/secrets/` (Penyimpanan kunci lokal `private.pem` & `public.pem`, *gitignored*)
   - `contracts/` (OpenAPI specs, gRPC `.proto`, JSON Schema Redis Streams)
+  - `assets/` (Infografis arsitektur & alur operasional dalam format SVG/PNG)
 - **CI/CD Pipeline**:
   - Perubahan di `infra/migrations/` otomatis memicu test migrasi terhadap PostgreSQL ephemeral + verifikasi `sqlx` (Rust), Prisma/TypeORM (Node.js), dan SQLAlchemy (Python).
   - Setiap PR wajib lulus *linting*, *unit test*, dan *build container* sebelum diizinkan *merge* ke `main`.
