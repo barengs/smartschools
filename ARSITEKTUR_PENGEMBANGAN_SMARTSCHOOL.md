@@ -1,9 +1,9 @@
 # Dokumen Arsitektur Pengembangan Aplikasi, Development Plan, dan Task List
 ## Ekosistem Smart School Terintegrasi (Hybrid Polyglot Architecture)
 
-**Versi Dokumen:** 1.0.0  
+**Versi Dokumen:** 1.3.0  
 **Tanggal:** 11 November 2026  
-**Basis Referensi:** Cetak Biru (Blueprint) Ekosistem Smart School Terintegrasi  
+**Basis Referensi:** Cetak Biru (Blueprint) Ekosistem Smart School Terintegrasi (Ekstensi E-PPDB, Buku Induk, Master Data, SIAKAD, E-Rapor, & Smart LMS Berbasis ML)  
 **Arsitektur Target:** Polyglot Service-Oriented Architecture (Node.js/NestJS, Rust/Axum, Python/FastAPI)  
 
 ---
@@ -103,9 +103,14 @@ Menangani **~75% cakupan fungsional** aplikasi yang berfokus pada logika bisnis 
 
 - **Tanggung Jawab Utama**:
   1. **Pusat SSO & IAM**: Registrasi/aktivasi akun warga sekolah, manajemen RBAC (Role, Permission, Role Assignment), penerbitan JWT RS256 (Access Token berumur pendek 15 menit + Refresh Token rotasi di Redis), manajemen *pin* transaksi kantin, serta manajemen siklus kartu identitas (`identity_cards`).
-  2. **E-PPDB & Buku Induk**: Portal pendaftaran, unggah berkas ke MinIO via *presigned URL*, verifikasi admin, pembuatan tagihan biaya pendaftaran (VA/QRIS), orkestrasi hasil *Placement Test* dari Rust, pengumuman kelulusan, dan **One-Click Migration** (memindahkan data calon siswa ke tabel `students`, membuat akun LMS, dan menginisialisasi `wallets`).
-  3. **SIAKAD & E-Rapor**: Manajemen tahun ajaran, rombongan belajar (rombel), mata pelajaran, sinkronisasi Dapodik/EMIS, rekap nilai dari LMS/CBT, penerbitan PDF E-Rapor, integrasi Tanda Tangan Elektronik (TTE/BSrE atau penyedia tersertifikasi), dan portofolio siswa.
-  4. **LMS (Course Management)**: Pembuatan materi, *streaming* video via S3/MinIO, tugas/PR, forum diskusi, dan manajemen **Bank Soal** (menyimpan soal ke tabel `cbt_exams` dan `cbt_questions` sebelum dieksekusi oleh Rust).
+  2. **E-PPDB & Buku Induk Digital**:
+     - *E-PPDB*: Konfigurasi gelombang/kuota/syarat dokumen dinamis, portal pendaftaran *multi-step* (*save draft*), *geotagging* zonasi (Haversine), *duplicate guard* NIK/NISN, integrasi tagihan formulir & daftar ulang (VA/QRIS), desk verifikasi *split-view* dengan status & revisi per dokumen, pembobotan skor & orkestrasi *Placement Test* dari Rust CBT, pengumuman terjadwal + SKL ber-QR, *waiting list* otomatis, serta **One-Click & Batch Migration** dengan generator NIS terstruktur.
+     - *Buku Induk Digital*: Profil induk lengkap standar Dapodik/EMIS (identitas kependudukan, domisili/transportasi, data terpisah Ayah/Ibu/Wali, kesehatan/E-UKS, KIP/PIP), brankas arsip legalitas MinIO (*versioning* & audit), manajemen kartu identitas RFID/QR, tampilan **Buku Induk 360° lintas tahun** (riwayat rombel, nilai/E-Rapor TTE, presensi/EWS, prestasi/E-BK), siklus mutasi masuk/keluar, kenaikan kelas & kelulusan massal ke Alumni, pengajuan ubah data mandiri + approval TU, cetak PDF Buku Induk & surat resmi ber-QR/TTE (terhubung ke Kiosk), serta impor massal & *pre-flight validator* Dapodik/EMIS.
+  3. **Master Data, SIAKAD, & E-Rapor**:
+     - *Master Data*: Profil sekolah & pejabat penandatangan TTE, tahun ajaran & kalender akademik (libur/ujian), multi-kurikulum (Kurikulum Merdeka/K-13) & fase, mata pelajaran + bank CP/TP & KKTP, GTK/PTK + beban JP + preferensi jadwal OR-Tools, ruang/lab & slot jam bel, rombel reguler & mapel pilihan, ekstrakurikuler & projek P5, serta formula bobot nilai & skala predikat.
+     - *SIAKAD*: Plotting guru & SK pembagian tugas, orkestrasi jadwal OR-Tools + editor manual + guru pengganti/piket, jurnal mengajar & presensi per jam pelajaran, monitoring keterlaksanaan KBM, manajemen rombel lintas periode/mapel pilihan, administrasi ujian sekolah & jadwal pengawas, rekap presensi & approval izin orang tua, serta sidang kenaikan kelas/kelulusan & sinkronisasi Dapodik/EMIS.
+     - *E-Rapor*: Perencanaan penilaian berbasis TP/kompetensi, input nilai massal/Excel + *auto-sync* nilai LMS & Rust CBT (`CbtExamSubmitted`), remedial & pengayaan, generator deskripsi capaian otomatis, rapor P5 & sikap, integrasi ekskul/prestasi/absensi S-I-A otomatis, workspace wali kelas + mekanisme *Lock/Unlock* nilai Waka Kurikulum, leger nilai & analitik peringkat, cetak PDF E-Rapor ber-TTE & QR verifikasi, serta *bridge* ekspor e-Rapor Kemendikbud/RDM Kemenag.
+  4. **Smart LMS (Dynamic Course & Adaptive Learning Management)**: Sinkronisasi kelas otomatis dari SIAKAD (`teaching_assignments`), penyusunan modul dinamis berbasis *Content Blocks* (`TEXT_LATEX`, `INTERACTIVE_VIDEO` MinIO, `DOC_SLIDE`, `SIMULATION_EMBED`, `FORMATIVE_QUIZ`, `ASSIGNMENT_RUBRIC`) yang ditandai dengan metadata pedagogis (`tp_id`, level Bloom `C1–C6`, tingkat kesulitan), aturan *Conditional Release* (jalur remedial/pengayaan adaptif), template MGMP, forum/live hybrid, manajemen **Bank Soal AKM** (`cbt_exams`, `cbt_questions`), serta pengumpulan telemetri belajar untuk analitik ML di Service C.
   5. **E-Finance & Billing**: Pembuatan tagihan SPP/uang gedung (`invoices`), penanganan webhook Payment Gateway (VA/QRIS), jurnal akuntansi sekolah, penggajian (*payroll*) guru & tendik, serta pelaporan dana BOS.
   6. **Layanan Kesiswaan, Perpustakaan & Sarpras**: E-BK (poin disiplin/prestasi, catatan konseling terenkripsi), E-UKS (rekam kunjungan medis, alergi/golongan darah), Alumni Tracer Study, E-Library (katalog OPAC, sirkulasi pinjam/kembali, e-book), dan Asset Management (QR inventaris, booking ruangan, tiket kerusakan).
   7. **Notification Dispatcher & Event Consumer**: Mengonsumsi Redis Streams (`AttendanceRecorded`, `WalletDeducted`, `ScheduleGenerated`, `EwsAlertRaised`) dan mendistribusikan notifikasi melalui **Firebase Cloud Messaging (FCM)**, **WhatsApp Gateway**, dan **Email** menggunakan antrean **BullMQ** agar pengiriman bervolume tinggi tidak memblokir API utama.
@@ -125,6 +130,57 @@ Menangani **~75% cakupan fungsional** aplikasi yang berfokus pada logika bisnis 
   │   └── notifications/  # Redis Stream Consumers + BullMQ Dispatchers (FCM/WA/Email)
   └── main.ts
   ```
+
+#### 3.1.1 Matriks Spesifikasi Fitur Wajib E-PPDB & Buku Induk Digital
+
+| Modul | Klaster Fitur | Rincian Fungsionalitas Wajib |
+| :--- | :--- | :--- |
+| **E-PPDB** | **1. Setup Gelombang & Kuota** | Multi-gelombang (Inden, Gel 1, Gel 2), jadwal otomatis per fase, kuota daya tampung per jenjang/jalur (`ZONASI`, `PRESTASI`, `AFIRMASI`, `MUTASI`, `REGULER`), aturan berkas wajib dinamis per jalur, tarif & kode voucher/beasiswa. |
+| **E-PPDB** | **2. Portal Publik & Zonasi** | Formulir *multi-step wizard* + *save draft*, pendaftaran kolektif *feeder school*, *duplicate guard* NIK/NISN, pemilih peta koordinat rumah + kalkulator jarak Haversine otomatis, unggah berkas MinIO *presigned URL*. |
+| **E-PPDB** | **3. Billing & Daftar Ulang** | Tagihan otomatis `PPDB_FEE` & `DAFTAR_ULANG_FEE` (VA/QRIS), buka kunci kartu peserta ujian saat lunas, dukungan cicilan & potongan beasiswa/anak guru/yatim. |
+| **E-PPDB** | **4. Verifikasi & Revisi** | Desk verifikasi *split-view* (data vs preview MinIO), status & catatan per dokumen (`APPROVED`, `NEED_REVISION`, `REJECTED`), notifikasi WA/Email/FCM untuk unggah ulang dokumen yang ditolak tanpa daftar ulang. |
+| **E-PPDB** | **5. Seleksi & Placement Test** | Kalkulator skor zonasi (jarak + usia) & prestasi (nilai rapor + bobot piagam), integrasi *Placement Test* via **Service B (Rust CBT)** (`CbtExamSubmitted`), input nilai wawancara, papan peringkat & pelimpahan sisa kuota. |
+| **E-PPDB** | **6. Pengumuman & Cadangan** | Rilis kelulusan terjadwal (*embargo*), cetak SKL PPDB ber-QR/TTE, konfirmasi daftar ulang (seragam & pernyataan), serta promosi otomatis dari *waiting list* jika peserta diterima mengundurkan diri. |
+| **E-PPDB** | **7. One-Click & Batch Migration** | Generator NIS terstruktur, migrasi atomik ke Buku Induk, penautan multi-anak ke 1 akun `ORANG_TUA`, aktivasi dompet kantin + kartu RFID/QR, penempatan rombel awal seimbang, & pembekuan arsip dokumen PPDB. |
+| **E-PPDB** | **8. Dashboard & Audit Trail** | Funnel konversi pendaftar *real-time*, peta sebaran asal sekolah, proyeksi kuota, dan log audit seluruh aksi verifikasi/kelulusan/migrasi. |
+| **Buku Induk** | **1. Profil Standar Dapodik/EMIS** | Identitas lengkap (NIS, NISN, NIK, No. KK, No. Akta, anak ke-, agama, disabilitas), alamat rinci + koordinat + transportasi, data terpisah Ayah/Ibu Kandung/Wali, data periodik kesehatan/alergi (E-UKS), & status KIP/PIP/PKH. |
+| **Buku Induk** | **2. Asal Sekolah & Brankas Arsip** | Riwayat sekolah asal (NPSN, nomor ijazah/SKL sebelumnya), penyimpanan arsip digital MinIO (*pas foto berkala, KK, Akta, Ijazah, Surat Pindah*) dengan *versioning* & audit akses. |
+| **Buku Induk** | **3. NIS & Kartu Identitas** | Generator NIS berurutan, validasi anti-duplikat NIK/NISN, cetak Kartu Pelajar fisik & Dynamic QR, serta alur ganti kartu hilang (blokir UID lama & invalidasi cache Redis `iam:rfid:*`). |
+| **Buku Induk** | **4. Buku Induk 360° Lintas Tahun** | Halaman timeline terpadu per siswa: riwayat rombel & wali kelas tiap semester, transkrip nilai & arsip PDF E-Rapor TTE, rekap presensi + skor EWS, prestasi/ekskul, & ringkasan poin E-BK. |
+| **Buku Induk** | **5. Mutasi, Kenaikan, & Kelulusan** | Alur Mutasi Masuk (pindahan), Mutasi Keluar/DO (surat pindah ber-QR, nonaktif RFID/rombel, *settlement* dompet), Kenaikan Kelas Massal, & Kelulusan Massal (nomor ijazah, status `GRADUATED`, transisi ke Alumni). |
+| **Buku Induk** | **6. Self-Service & Approval TU** | Pengajuan pembaruan biodata/dokumen oleh orang tua/siswa dari Web/Parent App; perubahan identitas legal masuk antrean persetujuan Staf TU/Operator Dapodik. |
+| **Buku Induk** | **7. Cetak Buku Induk & Surat** | Cetak PDF Lembar Buku Induk resmi (satuan/angkatan) & generator surat ber-QR/TTE (Surat Aktif via Kiosk, Kelakuan Baik, Surat Pindah, SKL). |
+| **Buku Induk** | **8. Impor & Validator Dapodik** | Impor massal Excel/CSV siswa lama, *Pre-Flight Completeness Validator* (deteksi NIK/NISN/Ibu Kandung kosong), & ekspor XLSX/CSV siap unggah Dapodik/EMIS. |
+
+#### 3.1.2 Matriks Spesifikasi Fitur Wajib Master Data, SIAKAD, & E-Rapor
+
+| Modul | Klaster Fitur | Rincian Fungsionalitas Wajib |
+| :--- | :--- | :--- |
+| **Master Data** | **1. Profil Sekolah & Pejabat TTE** | NPSN, NSS, kop surat, logo, akreditasi, data Kepala Sekolah aktif (NIP & sertifikat TTE/BSrE), serta tanggal titimangsa pembagian rapor per semester. |
+| **Master Data** | **2. Kalender Akademik & Periode** | Tahun ajaran (`ODD`/`EVEN`), tanggal efektif KBM, daftar hari libur nasional/sekolah (mencegah salah catat `ALPHA`), jadwal STS/SAS/Ujian Sekolah, & jadwal bagi rapor. |
+| **Master Data** | **3. Kurikulum, Fase, & CP/TP** | Dukungan multi-kurikulum (*Kurikulum Merdeka* Fase A–F & *K-13*), kelompok mapel (Wajib/Pilihan/Mulok/Kejuruan), jam tatap muka (JP), KKTP/KKM, & bank Capaian/Tujuan Pembelajaran (CP/TP). |
+| **Master Data** | **4. GTK/PTK, Ruang, & Slot Bel** | Data GTK standar Dapodik (NIP/NUPTK, linieritas, batas JP), preferensi jam kosong OR-Tools, master ruang kelas/lab beserta kapasitas, serta konfigurasi slot JP & variasi jadwal hari Jumat. |
+| **Master Data** | **5. Rombel, Ekskul, P5, & Formula Nilai** | Master rombel reguler & mapel pilihan, daftar ekstrakurikuler + pembina, tema & dimensi Projek P5, formula bobot nilai akhir (Formatif/Sumatif/SAS), & interval predikat (`A/B/C/D`). |
+| **SIAKAD** | **1. Plotting Guru & Beban JP** | Penetapan guru pengampu per `(Rombel, Mapel)`, validasi pemenuhan jam wajib sertifikasi (mis. 24 JP), penugasan Wali Kelas/Pembina, & cetak draf SK Pembagian Tugas Mengajar. |
+| **SIAKAD** | **2. Penjadwalan Pintar & Piket** | Pemodelan kendala ke `solve_timetable` (Python OR-Tools), editor manual *drag-and-drop* anti-bentrok, manajemen **Guru Pengganti/Piket** harian, & sinkronisasi jadwal ke IP Bell (Rust). |
+| **SIAKAD** | **3. Jurnal KBM & Presensi Mapel** | Jurnal mengajar `< 1 menit` (`teaching_journals`), presensi per jam pelajaran (bedakan dispensasi lomba/izin dari absen gerbang), & dashboard monitoring keterlaksanaan KBM bagi Waka Kurikulum. |
+| **SIAKAD** | **4. Mapel Pilihan, Ujian, & Izin** | Pengelolaan kelas mapel pilihan lintas rombel, penjadwalan ruang & pengawas ujian sekolah + kartu ujian, serta rekap absen RFID + approval izin/sakit orang tua oleh Wali Kelas. |
+| **SIAKAD** | **5. Sidang Kenaikan & Dapodik** | Rapat pleno kenaikan kelas digital (*early warning* dari EWS Python), pencatatan status akhir periode (`Naik`/`Tinggal`/`Lulus`), & sinkronisasi/ekspor resmi Dapodik/EMIS. |
+| **E-Rapor** | **1. Perencanaan & Input Nilai + Sync** | Pemilihan TP per semester, grid input massal & impor template Excel, serta **Auto-Sync** skor ujian CBT Rust (`cbt_student_submissions`) & nilai tugas LMS tanpa input ulang. |
+| **E-Rapor** | **2. Remedial & Deskripsi Otomatis** | Penandaan otomatis siswa di bawah KKTP, pencatatan histori nilai remedial/pengayaan, serta generator narasi deskripsi capaian otomatis berbasis TP tertinggi & terendah (dapat disunting guru). |
+| **E-Rapor** | **3. Projek P5, Ekskul, & Absensi** | Penilaian dimensi Projek P5 (*MB/SB/BSH/SAB*) & sikap, input nilai/deskripsi oleh pembina ekskul, penarikan otomatis daftar prestasi E-BK, serta rekap S/I/A otomatis dari presensi SIAKAD. |
+| **E-Rapor** | **4. Lock Nilai, Leger, & PDF Ber-TTE** | Monitor progres guru oleh Wali Kelas, mekanisme **Lock/Unlock Nilai** oleh Waka Kurikulum, cetak **Leger Nilai** kelas/angkatan (evaluasi & SNBP), render PDF E-Rapor + P5 bertanda tangan **TTE (BSrE) & QR Verifikasi**, serta *bridge* ekspor e-Rapor Kemendikbud / RDM Kemenag. |
+
+#### 3.1.3 Matriks Spesifikasi Fitur Wajib Smart LMS & ML Learning Analytics
+
+| Modul | Klaster Fitur | Rincian Fungsionalitas Wajib |
+| :--- | :--- | :--- |
+| **Core LMS** | **1. Sinkronisasi Kelas & Materi Multi-Format** | Auto-provisioning kelas dari `teaching_assignments` & `classroom_members`, dukungan teks/LaTeX, PDF/Slide, video streaming MinIO (*HTTP Range*), embed simulasi (GeoGebra/PhET/H5P), & kelas *live hybrid* (rekaman masuk MinIO). |
+| **Core LMS** | **2. Tugas Rubrik, Forum, & Bank Soal AKM** | Tugas individu/kelompok dengan **Rubrik Penilaian**, forum diskusi per modul, serta bank soal lengkap (PG, PG Kompleks AKM, Menjodohkan, Isian, Esai, Stimulus/Wacana) siap dieksekusi oleh Rust CBT. |
+| **Dynamic Module** | **3. Block-Based Module Composer & Tagging TP** | Penyusunan modul dinamis berbasis blok JSONB (`TEXT_LATEX`, `INTERACTIVE_VIDEO` + *checkpoint quiz*, `DOC_SLIDE`, `FORMATIVE_QUIZ`, `ASSIGNMENT_RUBRIC`) yang ditandai `tp_id`, level Bloom (`C1–C6`), & bobot kesulitan. |
+| **Dynamic Module** | **4. Adaptive Path, Template MGMP, & AI Draft** | Aturan *Conditional Release* otomatis (cabang **Remedial** jika di bawah KKTP & **Pengayaan HOTS** jika unggul), template kolaborasi MGMP, kloning lintas periode, serta draf struktur modul/soal berbantuan AI (*human-in-the-loop*). |
+| **ML Analytics (Service C)** | **5. Analisis Kualitas Materi & Kalibrasi Soal (IRT)** | Kalibrasi *Item Response Theory* (tingkat kesukaran, daya pembeda, efektivitas pengecoh) dari `cbt_student_submissions`, deteksi *bottleneck* video/blok materi (*drop-off* vs gagal kuis), & *prerequisite topic mining* antar-TP. |
+| **ML Analytics (Service C)** | **6. Perkembangan Siswa, Clustering, & Prediksi** | *Knowledge Tracing* penguasaan per `tp_id` (**Mastery Radar**), *clustering* ritme belajar (*K-Means/GMM*), upgrade **EWS ML** (`Scikit-learn` gabungan presensi + telemetri LMS + CBT) dengan penjelasan faktor risiko, & rekomender modul remedial personal. |
 
 ### 3.2 Service B — High-Concurrency & Transaction Engine (`Rust / Axum / SQLx / Tokio`)
 
@@ -168,11 +224,15 @@ Menangani **~10% modul** yang menuntut komputasi matematis berat (*CPU-bound*), 
      - Menerima parameter dari Node.js (periode akademik, daftar rombel, beban jam mengajar guru, mata pelajaran, ketersediaan laboratorium/ruang khusus, preferensi waktu/hari kosong guru).
      - Memodelkan *Hard Constraints* (guru tidak boleh mengajar 2 kelas sekaligus, kelas tidak boleh punya 2 pelajaran sekaligus, ruang lab tidak boleh bentrok, batas jam maksimal harian) dan *Soft Constraints* (sebaran mapel eksakta di jam pagi, menghindari jeda kosong panjang bagi guru).
      - Menjalankan solver secara asinkron (Worker/ThreadPool agar event loop FastAPI tetap responsif), menulis jadwal final ke `academic_lms.schedules`, dan mengirim event `ScheduleGenerated` ke Redis Streams.
-  2. **Early Warning System (EWS) Engine**:
+  2. **Early Warning System (EWS) Engine (Hybrid → ML)**:
      - Job terjadwal harian pukul **08.00 WIB** (serta pemicu manual oleh Kepala Sekolah/Guru BK).
-     - Menggunakan **Pandas** & **Scikit-learn** untuk memindai histori `high_speed_ops.attendances` (pola alfa beruntun, tren keterlambatan) dan `academic_lms.grades` (penurunan nilai signifikan lintas mata pelajaran).
-     - Menghitung `attendance_risk_score` (0–100), `academic_drop_score` (0–100), mengklasifikasikan `risk_level` (`LOW`, `MEDIUM`, `CRITICAL`), menghasilkan `recommended_action`, dan menulis ke `finance_analytics.ews_student_risk_scores`.
-  3. **Agregasi Analitik Eksekutif & Rekomendasi LMS**: Menyediakan endpoint agregasi statistik lintas semester/angkatan untuk Dashboard Yayasan & Kepala Sekolah serta rekomendasi materi remedial berbasis capaian nilai siswa.
+     - Memadukan histori `high_speed_ops.attendances`, `academic_lms.grades`, telemetri tugas/progres Smart LMS, dan hasil CBT ke model **Pandas** & **Scikit-learn** (*RandomForest / GradientBoosting* dengan fallback *rule-based* saat *cold-start*).
+     - Menghitung `attendance_risk_score` (0–100), `academic_drop_score` (0–100), mengklasifikasikan `risk_level` (`LOW`, `MEDIUM`, `CRITICAL`), menyertakan kontribusi faktor penyebab & `recommended_action`, dan menulis ke `finance_analytics.ews_student_risk_scores`.
+  3. **Smart LMS Analytics & Adaptive Recommender (ML Pipeline)**:
+     - **Analisis Kualitas Materi & Kalibrasi Butir Soal (IRT)**: Menghitung *p-value* kesukaran, daya pembeda, dan efektivitas pengecoh dari `cbt_student_submissions` (`lms_item_calibration`), serta mendeteksi blok materi *bottleneck* (korelasi *video drop-off* / durasi baca terhadap kegagalan kuis TP terkait).
+     - **Knowledge Tracing & Clustering Gaya Belajar**: Menghitung skor penguasaan per Tujuan Pembelajaran (`lms_student_mastery_profiles` via *Bayesian Knowledge Tracing / EWMA*) dan mengelompokkan ritme belajar siswa (*K-Means / GMM*).
+     - **Adaptive Remedial Recommender & AI Module Draft**: Merekomendasikan blok remedial/pengayaan personal per siswa dan membantu mengekstrak draf blok modul/TP dari silabus/PDF guru (*human-in-the-loop*).
+  4. **Agregasi Analitik Eksekutif**: Menyediakan endpoint agregasi statistik lintas semester/angkatan untuk Dashboard Yayasan & Kepala Sekolah.
 
 ### 3.4 Kontrak Komunikasi Antar-Layanan
 
@@ -182,6 +242,8 @@ Menangani **~10% modul** yang menuntut komputasi matematis berat (*CPU-bound*), 
 | :--- | :--- | :--- | :--- |
 | Service A (Node.js) | Service C (Python) | `POST /internal/ai/schedules/generate` | Memicu kalkulasi jadwal OR-Tools (mengembalikan `job_id` status `PROCESSING`) |
 | Service A (Node.js) | Service C (Python) | `GET /internal/ai/analytics/executive-summary` | Mengambil hasil agregasi tren akademik & EWS untuk Dashboard |
+| Service A (Node.js) | Service C (Python) | `POST /internal/ai/lms/analyze-content` | Memicu kalibrasi butir soal (IRT) & analisis efektivitas blok materi LMS |
+| Service A (Node.js) | Service C (Python) | `GET /internal/ai/lms/student-mastery/{student_id}` | Mengambil *Mastery Radar* per TP, klaster belajar, & rekomendasi blok remedial |
 | Service A (Node.js) | Service B (Rust) | `POST /internal/engine/cbt/{exam_id}/prewarm` | Memicu pre-warming soal CBT ke Redis secara manual/terjadwal |
 | Service A (Node.js) | Service B (Rust) | `POST /internal/engine/wallets/credit` | Menambah saldo dompet saat webhook top-up QRIS/VA terkonfirmasi secara atomik |
 
@@ -196,6 +258,7 @@ Seluruh event menggunakan amplop JSON seragam: `{ "event_id": "uuid", "event_typ
 | `CbtExamSubmitted` | Service B (Rust) | Service A (Node.js) | Sinkronkan nilai CBT ke rekap penilaian SIAKAD & log aktivitas LMS |
 | `ScheduleGenerated` | Service C (Python) | Service A (Node.js) & Service B (Rust) | Node.js notif ke Guru/Siswa; Rust sinkron jadwal bunyi Automated IP Bell |
 | `EwsAlertRaised` | Service C (Python) | Service A (Node.js) | Tampilkan notifikasi prioritas ke Dashboard Kepala Sekolah & Guru BK |
+| `LmsAdaptivePathTriggered` | Service C (Python) | Service A (Node.js) | Membuka blok modul remedial/pengayaan adaptif & kirim saran belajar ke Student App |
 
 ---
 
@@ -218,16 +281,20 @@ Untuk menjaga integritas relasional (*Foreign Key* antar domain) tanpa menciptak
 - `users`: `id` (UUID, PK), `username` (Unique), `email` (Unique), `phone`, `password_hash`, `pin_hash` (untuk PIN kantin/otorisasi), `is_active`, `last_login_at`.
 - `roles`, `permissions`, `user_roles`: Konfigurasi RBAC lintas portal Web dan aplikasi Mobile.
 - `identity_cards`: `id` (UUID, PK), `user_id` (FK → `users.id`), `rfid_uid` (Unique Index — di-cache & dibaca cepat oleh Rust), `qr_token`, `card_status` (`ACTIVE`, `LOST`, `BLOCKED`).
-- `students`: `id` (UUID, PK), `user_id` (FK), `nis` (Unique), `nisn` (Unique), `nik`, `full_name`, `gender`, `birth_date`, `blood_type`, `allergy_notes`, `status` (`CANDIDATE`, `ACTIVE`, `GRADUATED`, `TRANSFERRED`), `dapodik_sync_id`.
+- `students`: `id` (UUID, PK), `user_id` (FK), `nis` (Unique), `nisn` (Unique), `nik`, `full_name`, `gender`, `birth_date`, `blood_type`, `allergy_notes`, `status` (`CANDIDATE`, `ACTIVE`, `GRADUATED`, `TRANSFERRED`, `DROPPED`), `dapodik_sync_id`.
+- `student_profiles` *(ekstensi 1:1 `students` untuk Buku Induk standar Dapodik/EMIS)*: `student_id` (PK/FK), `birth_place`, `religion`, `kk_number`, `birth_cert_number`, `child_order`, `siblings_count`, `special_needs`, `address_detail_jsonb` (jalan, RT/RW, kelurahan–provinsi, koordinat), `living_type`, `transport_mode`, `distance_km`, `kip_pip_pkh_jsonb`, `previous_school_npsn`, `prev_ijazah_number`, `graduated_ijazah_number`.
 - `teachers_and_staff`: `id` (UUID, PK), `user_id` (FK), `nip_nuptk`, `full_name`, `employment_status`, `position`.
-- `parents` & `student_parent_relations`: Relasi keluarga (`FATHER`, `MOTHER`, `GUARDIAN`, `is_primary_contact`) untuk menentukan penerima notifikasi dan pengelola batas jajan siswa.
+- `parents` & `student_parent_relations`: Relasi keluarga (`FATHER`, `MOTHER`, `GUARDIAN`, `is_primary_contact`) dilengkapi `nik`, `birth_year`, `education`, `occupation`, `income_range`, `is_alive` standar Dapodik untuk multi-anak dalam 1 akun orang tua, penerima notifikasi, dan pengelola batas jajan siswa.
+- `student_mutations` & `student_data_change_requests`: Log permanen mutasi masuk/keluar/kelulusan (`mutation_type`, nomor surat, sekolah asal/tujuan, tanggal efektif) serta antrean approval perubahan biodata mandiri dari orang tua/siswa.
 
 #### 2. Skema `academic_lms`
-- `academic_periods`, `classrooms`, `classroom_members`, `subjects`: Master struktur tahun ajaran, kelas, penempatan siswa, dan kurikulum.
-- `ppdb_applications` *(Ditulis oleh Node.js — `007_ppdb_applications.sql`)*: `id` (UUID, PK), `registration_number` (Unique), `academic_period_id` (FK), `student_id` (FK Unique → `iam_master.students.id`), `admission_track` (`ZONASI`, `PRESTASI`, `AFIRMASI`, `MUTASI`, `REGULER`), `documents_jsonb` (JSONB referensi MinIO `ppdb-docs`), `verification_status` (`DRAFT`, `SUBMITTED`, `VERIFIED`, `REJECTED`, `ACCEPTED`, `MIGRATED`), `invoice_id` (FK), `migrated_at`.
-- `schedules` *(Ditulis oleh Python OR-Tools & disesuaikan Node.js)*: `id` (UUID, PK), `academic_period_id` (FK), `classroom_id` (FK), `subject_id` (FK), `teacher_id` (FK), `room_code`, `day_of_week`, `start_time`, `end_time`.
-- `teaching_journals`: Jurnal harian mengajar guru dari Teacher App (`teacher_id`, `schedule_id`, `topic`, `notes`, `logged_at`).
-- `grades` & `e_rapor_documents`: Nilai akhir per kompetensi, deskripsi capaian, serta `tte_signed_pdf_url` (tautan PDF E-Rapor di MinIO yang sudah ber-TTE).
+- `academic_periods`, `academic_calendars` *(hari libur nasional/sekolah, jadwal ujian, tanggal bagi rapor)*, `school_profiles` *(NPSN, kop, kepsek, info sertifikat TTE)*, `curricula`, `rooms`, `bell_slots`, `classrooms`, `classroom_members`, `student_enrollments` *(riwayat rombel & status kenaikan lintas semester)*, `subjects`, `learning_objectives` *(bank CP/TP & KKTP)*, `teaching_assignments` *(plotting guru–rombel–mapel–JP)*: Master struktur akademik, kurikulum, ruang, dan beban mengajar.
+- `ppdb_waves`, `ppdb_quotas`, `ppdb_applications` *(Ditulis oleh Node.js — `007_ppdb_applications.sql` + ekstensi)*, `ppdb_application_documents`, `ppdb_scores`: Konfigurasi gelombang & kuota jalur, `registration_number`, `admission_track` (`ZONASI`, `PRESTASI`, `AFIRMASI`, `MUTASI`, `REGULER`), koordinat zonasi & jarak Haversine, status verifikasi per dokumen (`PENDING`, `APPROVED`, `NEED_REVISION`, `REJECTED`), skor komponen seleksi (zonasi, rapor/prestasi, CBT Placement, wawancara), status aplikasi (`DRAFT`, `SUBMITTED`, `NEED_REVISION`, `VERIFIED`, `WAITLISTED`, `ACCEPTED`, `RE_REGISTERED`, `REJECTED`, `MIGRATED`), `invoice_id` (FK), dan `migrated_at`.
+- `official_letters`: Registrasi nomor surat otomatis, jenis surat (SKL PPDB, Surat Aktif, Kelakuan Baik, Surat Pindah, Lembar Buku Induk), `qr_verification_token`, `tte_signature_hash`, dan tautan PDF MinIO.
+- `schedules` *(Ditulis oleh Python OR-Tools & disesuaikan Node.js)*: `id` (UUID, PK), `academic_period_id` (FK), `classroom_id` (FK), `subject_id` (FK), `teacher_id` (FK), `room_code`, `day_of_week`, `start_time`, `end_time`, plus dukungan log guru pengganti/piket.
+- `teaching_journals` & `lesson_attendances`: Jurnal harian mengajar guru dari Teacher App (`teacher_id`, `schedule_id`, `topic`, `notes`, `logged_at`) beserta presensi siswa per jam pelajaran.
+- `grade_weights`, `grades` *(Formatif, Sumatif, STS, SAS, Praktik, Remedial, serta narasi deskripsi)*, `grade_locks`, `extracurriculars`, `extracurricular_enrollments`, `p5_projects`, `p5_assessments`, `homeroom_notes`, & `e_rapor_documents`: Penilaian berbasis TP/kompetensi, P5, ekskul, catatan wali kelas, leger, serta `tte_signed_pdf_url` & `qr_verification_token` (tautan PDF E-Rapor Intrakurikuler & P5 di MinIO yang sudah ber-TTE).
+- `lms_courses`, `lms_modules`, `lms_module_blocks` *(JSONB blok dinamis + tag `tp_id`, Bloom `C1–C6`, kesulitan)*, `lms_adaptive_rules` *(aturan cabang remedial/pengayaan)*, `lms_student_progress`, `lms_learning_events` *(telemetri durasi baca, video drop-off, revisi jawaban)*: Fondasi Smart LMS dinamis dan pengumpul sinyal perilaku belajar.
 - `counseling_records` (E-BK — kolom catatan konseling dienkripsi di tingkat aplikasi), `uks_visits` (E-UKS), `library_catalogs`, `library_loans`, `assets`, `maintenance_tickets`.
 
 #### 3. Skema `high_speed_ops`
@@ -240,6 +307,7 @@ Untuk menjaga integritas relasional (*Foreign Key* antar domain) tanpa menciptak
 #### 4. Skema `finance_analytics`
 - `invoices` *(Dikelola Node.js)*: `id` (UUID, PK), `invoice_number` (Unique), `student_id` (FK), `billing_type`, `amount` (**BIGINT**), `due_date`, `status` (`UNPAID`, `PAID`, `EXPIRED`), `va_number`, `qris_string`, `paid_at`.
 - `ews_student_risk_scores` *(Dihasilkan Python Analytics Engine)*: `id` (UUID, PK), `student_id` (FK), `calculated_date`, `attendance_risk_score` (`0–100`), `academic_drop_score` (`0–100`), `risk_level` (`LOW`, `MEDIUM`, `CRITICAL`), `recommended_action`, `is_resolved_by_bk` (BOOLEAN).
+- `lms_item_calibration` & `lms_student_mastery_profiles` *(Dihasilkan Python ML Service)*: Skor IRT kesukaran/daya pembeda butir soal, efektivitas blok materi (*bottleneck flag*), probabilitas penguasaan per `tp_id` (BKT/EWMA), klaster ritme belajar, & daftar `recommended_block_ids`.
 
 ### 4.3 Strategi Migrasi Database Terpusat
 Karena ada tiga bahasa pemrograman yang mengakses satu database PostgreSQL yang sama:
@@ -267,10 +335,11 @@ Visualisasi berikut merangkum bagaimana ketiga mesin bekerja sama secara otomati
 ![Infografis 4 Alur Operasional Harian Smart School](assets/alur-operasional-smart-school.png)
 
 ### 5.1 Alur E-PPDB hingga One-Click Migration ke Buku Induk
-1. Calon siswa mendaftar via Portal E-PPDB Web (Node.js) dan mengunggah berkas ke MinIO via *presigned URL*.
-2. Node.js menerbitkan `invoices` biaya formulir dan menerima webhook pelunasan VA/QRIS.
-3. Jika ada tes seleksi, peserta mengikuti *Placement Test* yang ditangani oleh **CBT Engine (Rust)** untuk ketahanan trafik serentak.
-4. Setelah dinyatakan diterima, admin klik **One-Click Migration** di SIAKAD (Node.js). Dalam satu transaksi terkoordinasi, Node.js memutakhirkan status di `iam_master.students` (`ACTIVE`), menetapkan `nis`, mengaktifkan akses LMS, lalu memanggil endpoint internal Rust untuk menginisialisasi baris dompet di `high_speed_ops.wallets`.
+1. **Setup & Pendaftaran**: Panitia mengatur gelombang, kuota jalur, dan syarat dokumen (`ppdb_waves`, `ppdb_quotas`). Calon siswa mendaftar via Portal E-PPDB *Multi-Step* (menyimpan *draft*, menandai titik koordinat zonasi, dan mengunggah berkas ke MinIO via *presigned URL* dengan *duplicate guard* NIK/NISN).
+2. **Billing & Verifikasi Granular**: Node.js menerbitkan `invoices` (`PPDB_FEE`) dan menerima webhook pelunasan VA/QRIS untuk membuka kartu peserta. Staf TU memeriksa berkas di *split-view desk* dengan status per dokumen (`APPROVED` / `NEED_REVISION` yang memicu notif WA/Email untuk unggah ulang).
+3. **Seleksi & Placement Test**: Sistem menghitung skor jarak zonasi/rapor/piagam; jika ada tes seleksi, peserta mengikuti *Placement Test* di **CBT Engine (Rust)** dan hasilnya otomatis masuk ke `ppdb_scores` via `CbtExamSubmitted`.
+4. **Pengumuman, Daftar Ulang, & Waiting List**: Hasil dirilis sesuai jadwal (*embargo*) beserta cetak SKL ber-QR. Peserta lulus melakukan daftar ulang (`DAFTAR_ULANG_FEE` & seragam); kuota yang mengundurkan diri dipromosikan dari `WAITLISTED`.
+5. **One-Click / Batch Migration ke Buku Induk**: Admin memicu migrasi atomik di SIAKAD (Node.js): menetapkan **NIS berurutan**, memperbarui `iam_master.students` (`ACTIVE`) & `student_profiles`, menautkan multi-anak ke akun `ORANG_TUA`, membekukan arsip PPDB sebagai arsip awal Buku Induk, menempatkan rombel awal (`student_enrollments`), mengaktifkan Kartu Pelajar RFID/QR (`identity_cards`), serta menginisialisasi dompet di `high_speed_ops.wallets`. Siklus Buku Induk berlanjut hingga mutasi, kenaikan kelas massal, dan kelulusan ke Alumni.
 
 ### 5.2 Alur Penyusunan Jadwal Pelajaran Otomatis (`Node.js ↔ Python → Rust`)
 1. Waka Kurikulum mengatur beban mengajar guru, ketersediaan lab/ruangan, dan preferensi waktu di Web SIAKAD (Node.js), lalu menekan **"Susun Jadwal Otomatis"**.
@@ -391,30 +460,31 @@ Seluruh layanan dikemas menggunakan **Docker** (multi-stage build):
 #### Fase 1: Fondasi Core ERP & Tagihan (Bulan 1 – 3 | Sprint 1 – 6)
 - **Fokus Teknologi**: Infrastruktur dasar, PostgreSQL SSOT, Node.js (NestJS), React.js (Vite), MinIO, Redis.
 - **Sprint 1–2 (Setup & IAM)**: Setup Docker/Kong/PG/Redis/MinIO, skema migrasi awal `iam_master`, implementasi SSO JWT RS256 & RBAC di Node.js, shell Web Portal React.
-- **Sprint 3–4 (E-PPDB & Buku Induk)**: Modul formulir E-PPDB, upload dokumen MinIO, *One-Click Migration* ke `students`, master Tahun Ajaran, Rombel, & Mapel (`academic_lms`).
-- **Sprint 5–6 (SIAKAD Dasar & E-Finance)**: Pengelolaan nilai dasar, penerbitan `invoices` SPP, integrasi webhook Payment Gateway (VA/QRIS), laporan tagihan & kas dasar, UAT Fase 1.
-- **Exit Criteria Fase 1**: Siswa dapat mendaftar via E-PPDB, dimigrasi 1-klik ke Buku Induk SIAKAD, login via SSO ke portal web, dan orang tua/siswa dapat melunasi tagihan SPP otomatis via VA/QRIS.
+- **Sprint 3 (E-PPDB Inti, Geotagging Zonasi, & Billing Formulir)**: Konfigurasi gelombang/kuota/syarat dokumen dinamis (`ppdb_waves`, `ppdb_quotas`), portal publik *multi-step wizard* + *save draft*, *duplicate guard* NIK/NISN, kalkulator jarak zonasi Haversine, unggah berkas MinIO *presigned URL*, serta tagihan `PPDB_FEE` (VA/QRIS) & buka kunci kartu ujian.
+- **Sprint 4 (Verifikasi Granular, Seleksi, Migration, & Buku Induk 360°)**: Desk verifikasi *split-view* + alur revisi per dokumen (`NEED_REVISION`), papan peringkat jalur & *waiting list*, pengumuman terjadwal + daftar ulang, **Generator NIS berurutan & One-Click/Batch Migration** ke `students` + `student_profiles` (biodata Dapodik, data Ayah/Ibu/Wali, brankas arsip, kartu RFID/QR, dompet, & rombel awal), serta halaman **Lembar Buku Induk 360°**.
+- **Sprint 5–6 (Master Data SIAKAD, Siklus Mutasi, Dapodik, & E-Finance)**: Master Data lengkap SIAKAD (Profil Sekolah & pejabat TTE, Kalender Akademik/libur, multi-kurikulum & bank CP/TP, beban JP GTK & preferensi jadwal, ruang/lab, slot bell, ekskul/P5, formula bobot nilai & KKTP), plotting guru per rombel + SK Tugas, alur Mutasi Masuk/Keluar (*settlement* dompet & blokir RFID), Kenaikan Kelas Massal, cetak PDF Buku Induk & surat resmi ber-QR/TTE, impor massal Excel + *Pre-Flight Validator* & ekspor XLSX Dapodik/EMIS, penerbitan `invoices` SPP, webhook Payment Gateway (VA/QRIS), laporan tagihan/BOS, dan UAT Fase 1.
+- **Exit Criteria Fase 1**: Calon siswa dapat mendaftar via E-PPDB multi-gelombang, dimigrasi 1-klik/batch ke Buku Induk 360° siap Dapodik/EMIS, seluruh **Master Data Kurikulum/GTK/Kalender** & plotting guru SIAKAD siap, dan orang tua melunasi tagihan PPDB/SPP otomatis via VA/QRIS.
 
 #### Fase 2: Mesin IoT Kehadiran, Penjadwalan Pintar, & Mobile Apps (Bulan 4 – 6 | Sprint 7 – 12)
 - **Fokus Teknologi**: Rust (Axum), EMQX MQTT, ESP32 RFID, Python (FastAPI + OR-Tools), Flutter (Dart + Mapbox).
 - **Sprint 7–8 (IoT Ingestion & Auto-Scheduling Core)**: Setup EMQX & skeleton Rust Service B (verifikasi `public.pem` RS256 + MQTT worker), firmware ESP32 RFID + offline buffer, serta model OR-Tools CP-SAT di Python Service C.
-- **Sprint 9–10 (Integrasi Jadwal & Presensi Real-Time)**: Alur lengkap `Node.js ↔ Python` untuk generate jadwal bebas bentrok; alur `ESP32 → EMQX → Rust → Redis → Node.js FCM`; inisiasi Flutter Shared Core.
-- **Sprint 11–12 (Rilis Mobile Apps V1)**: Rilis Parent App (notif hadir & izin digital), Teacher App (presensi GPS Mapbox + swafoto + jurnal mengajar `< 1 menit`), Student App (Kartu Pelajar Dynamic QR & jadwal), uji coba lapangan di 1 gerbang sekolah.
-- **Exit Criteria Fase 2**: Tap kartu RFID di gerbang masuk `< 3 ms` memicu notif di ponsel orang tua, jadwal 1 sekolah tersusun tanpa bentrok oleh Python, dan 3 aplikasi Flutter berjalan di Android/iOS.
+- **Sprint 9–10 (Integrasi Jadwal, Jurnal KBM, Presensi Mapel, & Izin Digital)**: Alur lengkap `Node.js ↔ Python` untuk generate jadwal bebas bentrok + editor manual *drag-and-drop* & manajemen **Guru Pengganti/Piket**, alur `ESP32 → EMQX → Rust → Redis → Node.js FCM`, jurnal mengajar `< 1 mnt` + presensi per jam pelajaran & monitoring KBM Waka Kurikulum, approval izin orang tua, serta inisiasi Flutter Shared Core.
+- **Sprint 11–12 (Rilis Mobile Apps V1)**: Rilis Parent App (notif hadir & izin digital), Teacher App (presensi GPS Mapbox + swafoto + jurnal mengajar `< 1 menit` + absen mapel), Student App (Kartu Pelajar Dynamic QR & jadwal), uji coba lapangan di 1 gerbang sekolah.
+- **Exit Criteria Fase 2**: Tap kartu RFID di gerbang masuk `< 3 ms` memicu notif di ponsel orang tua, jadwal 1 sekolah tersusun tanpa bentrok oleh Python (beserta piket/izin & jurnal KBM aktif), dan 3 aplikasi Flutter berjalan di Android/iOS.
 
-#### Fase 3: Pembelajaran Digital & Mesin Ujian CBT Berkinerja Tinggi (Bulan 7 – 9 | Sprint 13 – 18)
-- **Fokus Teknologi**: LMS (Node.js), CBT Engine (Rust + Redis), E-Rapor TTE (Node.js), IP Bell & Smartboard.
-- **Sprint 13–14 (LMS & Bank Soal)**: Modul LMS di Node.js (materi, streaming video MinIO, tugas, forum, bank soal `cbt_exams`/`cbt_questions`), tampilan LMS di Web & Student App.
-- **Sprint 15–16 (CBT Engine Rust)**: Implementasi *pre-warmer* soal terenkripsi ke Redis, pengacakan soal per siswa, WebSocket/HTTP sync jawaban, validasi *Exam Browser Lock*, *auto-grading* mikrodetik, dan sinkronisasi hasil ke SIAKAD.
-- **Sprint 17–18 (E-Rapor TTE, IP Bell, & Load Test CBT)**: Generator PDF E-Rapor + integrasi TTE, sinkronisasi jadwal IP Bell di Rust + Signage/Smartboard SSO, serta **Load Test k6 1.000+ peserta CBT serentak** (Cloud & Edge Mini-Server).
-- **Exit Criteria Fase 3**: Simulasi ujian CBT 1.000+ siswa serentak berjalan lancar dengan CPU/RAM `< 20%`, E-Rapor terbit dengan TTE valid, dan bel sekolah otomatis sinkron dengan jadwal OR-Tools.
+#### Fase 3: Pembelajaran Digital (Smart LMS), Mesin Ujian CBT, & E-Rapor TTE (Bulan 7 – 9 | Sprint 13 – 18)
+- **Fokus Teknologi**: Smart LMS Dinamis (Node.js), CBT Engine (Rust + Redis), E-Rapor TTE (Node.js), IP Bell & Smartboard.
+- **Sprint 13–14 (Smart LMS Dinamis, Bank Soal AKM, & Telemetri Belajar)**: Sinkronisasi kelas otomatis dari `teaching_assignments`, **Block-Based Module Composer** (`lms_modules`, `lms_module_blocks` bertag `tp_id` & Bloom `C1–C6`), *Conditional Adaptive Path* (cabang remedial/pengayaan), template MGMP, streaming video MinIO + *checkpoint quiz*, tugas rubrik, bank soal AKM (`cbt_exams`/`cbt_questions`), serta pipa telemetri `lms_learning_events` di Web & Student App.
+- **Sprint 15–16 (CBT Engine Rust, Placement Test E-PPDB, & Administrasi Ujian)**: Implementasi *pre-warmer* soal terenkripsi ke Redis, pengacakan soal per siswa, WebSocket/HTTP sync jawaban + telemetri durasi per butir soal, validasi *Exam Browser Lock*, *auto-grading* mikrodetik, penjadwalan ruang/pengawas ujian, orkestrasi sesi **Placement Test E-PPDB** (`ppdb_scores`), dan sinkronisasi hasil ke SIAKAD/PPDB.
+- **Sprint 17–18 (E-Rapor Kurikulum Merdeka/K-13 ber-TTE, IP Bell, & Load Test CBT)**: Auto-sync nilai LMS & CBT, modul remedial/pengayaan di bawah KKTP, generator deskripsi capaian TP otomatis, penilaian Projek P5 & Ekskul, rekap S/I/A otomatis, *Lock/Unlock* nilai Waka Kurikulum, Leger Nilai, render PDF E-Rapor + integrasi **TTE (BSrE) & QR Verifikasi**, *bridge* ekspor e-Rapor Kemendikbud/RDM, sinkronisasi jadwal IP Bell di Rust + Signage/Smartboard SSO, serta **Load Test k6 1.000+ peserta CBT serentak**.
+- **Exit Criteria Fase 3**: Guru menyusun modul dinamis bertag TP dengan jalur adaptif, simulasi ujian CBT 1.000+ siswa serentak berjalan lancar (`< 20%` CPU/RAM), E-Rapor Intrakurikuler & P5 terbit dengan TTE valid, dan telemetri belajar terekam untuk ML Fase 4.
 
-#### Fase 4: Ekosistem Kantin Cashless, Layanan Kesiswaan, & Kecerdasan EWS (Bulan 10 – 12 | Sprint 19 – 24)
-- **Fokus Teknologi**: Atomic Wallet & POS (Rust), E-BK/E-UKS/E-Library/Sarpras (Node.js), EWS & Analitik (Python), Kios Mandiri.
+#### Fase 4: Ekosistem Kantin Cashless, Layanan Kesiswaan, & Kecerdasan ML + EWS (Bulan 10 – 12 | Sprint 19 – 24)
+- **Fokus Teknologi**: Atomic Wallet & POS (Rust), E-BK/E-UKS/E-Library/Sarpras (Node.js), ML Analytics & EWS (Python `Scikit-learn`), Kios Mandiri.
 - **Sprint 19–20 (Atomic Wallet & POS Kantin)**: Implementasi `wallets` (`BIGINT`), *top-up* QRIS via Node.js → Rust, batas jajan harian di Parent App, endpoint POS Rust (`SELECT ... FOR UPDATE` + `idempotency_key`), serta aplikasi kasir POS Kantin & notifikasi rincian jajan.
-- **Sprint 21–22 (Layanan Kesiswaan, Perpus & Sarpras)**: Modul E-BK (enkripsi AES-256), E-UKS, Alumni Tracer Study, E-Library OPAC & Kios Mandiri, serta inventaris QR & tiket kerusakan Sarpras.
-- **Sprint 23–24 (Early Warning System & Final Hardening)**: Implementasi model EWS harian (08.00 WIB) di Python, Executive Dashboard Kepala Sekolah/Yayasan, *penetration testing*, *chaos/race condition testing*, dan serah terima produksi penuh.
-- **Exit Criteria Fase 4**: Transaksi kantin `< 5 ms` bebas *double-deduct* dan saldo minus, seluruh modul kesiswaan/sarpras aktif, serta Dashboard Eksekutif menampilkan skor risiko EWS secara akurat setiap pagi.
+- **Sprint 21–22 (Layanan Kesiswaan, Self-Service Buku Induk, & Kelulusan Alumni)**: Modul E-BK (enkripsi AES-256), E-UKS (sinkron alergi/kesehatan Buku Induk), **Kelulusan Massal Buku Induk** → Alumni Tracer Study, pengajuan ubah biodata mandiri di Parent App (+ approval TU), E-Library OPAC & **Self-Service Kiosk** (pinjam buku + cetak Surat Keterangan Aktif ber-QR), serta inventaris QR & tiket kerusakan Sarpras.
+- **Sprint 23–24 (ML Smart LMS Analytics, EWS Hybrid → ML, & Final Hardening)**: Implementasi pipeline ML Service C (kalibrasi butir soal IRT, deteksi *bottleneck* materi LMS, *Knowledge Tracing* Mastery Radar per TP, *clustering* ritme belajar, rekomender remedial adaptif `LmsAdaptivePathTriggered`, & upgrade EWS harian 08.00 WIB ke `Scikit-learn` dengan penjelasan faktor penyebab), Dashboard Analitik Guru & Eksekutif Kepala Sekolah/Yayasan, *penetration testing*, *chaos/race condition testing*, dan serah terima produksi penuh.
+- **Exit Criteria Fase 4**: Transaksi kantin `< 5 ms` bebas *double-deduct* dan saldo minus, guru mendapat analitik kualitas soal/materi & radar penguasaan TP siswa berbasis ML, dan Dashboard Eksekutif menampilkan skor risiko EWS secara akurat setiap pagi.
 
 ### 8.4 Manajemen Risiko & Mitigasi Teknis
 
@@ -423,7 +493,7 @@ Seluruh layanan dikemas menggunakan **Docker** (multi-stage build):
 | **Konflik Skema DB antar 3 Bahasa** | Query gagal saat runtime (terutama `sqlx` Rust) | Terapkan **Single Migration Authority** (`infra/migrations/`), wajib *schema check* di CI untuk Node.js, Rust, & Python. |
 | **Putus Koneksi Internet Sekolah saat Jam Masuk / Ujian** | Presensi gerbang gagal atau CBT terhenti | Firmware ESP32 menyimpan log ke *flash* lokal + *batch retry*; binari Rust CBT (`~20 MB`) dideploy di **Local Mini-Server** sekolah. |
 | **Race Condition / Tap Ganda di POS Kantin** | Saldo siswa terpotong dua kali atau menjadi minus | Gunakan `BIGINT` rupiah, `SELECT ... FOR UPDATE`, validasi batas harian di dalam transaksi DB, dan wajib `idempotency_key` unik. |
-| **Ketidakakuratan Data Awal EWS (Cold Start)** | Skor EWS belum akurat di bulan-bulan awal | Mulai dengan aturan *rule-based scoring* berbasis bobot alfa & penurunan nilai pada Fase 4, lalu latih model ML Scikit-learn setelah data 1–2 semester terkumpul. |
+| **Ketidakakuratan Data Awal EWS & ML LMS (Cold Start)** | Skor EWS, IRT, & rekomender belum akurat di bulan awal | Terapkan mode *Hybrid*: mulai dengan aturan *rule-based scoring* (`ews.py`) + statistik deskriptif dasar sambil merekam telemetri LMS, lalu aktifkan model `Scikit-learn` setelah data ≥ 1 semester terkumpul dengan prinsip *human-in-the-loop*. |
 
 ---
 
@@ -431,75 +501,90 @@ Seluruh layanan dikemas menggunakan **Docker** (multi-stage build):
 
 Kode Workstream: `INF` (Infra/DevOps), `DB` (Database SSOT), `CORE` (Service A Node.js), `ENG` (Service B Rust), `AI` (Service C Python), `WEB` (Frontend React), `MOB` (Mobile Flutter), `IOT` (Hardware/Firmware), `QA` (Testing & Security).
 
-### 9.1 Task List Fase 1: Fondasi Core ERP & Tagihan (Bulan 1 – 3)
+### 9.1 Task List Fase 1: Fondasi Core ERP, E-PPDB, Buku Induk, & Tagihan (Bulan 1 – 3)
 
-| ID | Tugas (Task) | Stream | Prioritas | Est. (MD) | Dependensi | Kriteria Penerimaan (Acceptance Criteria) |
-| :--- | :--- | :---: | :---: | :---: | :--- | :--- |
-| `INF-01` | Setup Monorepo, Docker Compose lokal, & CI/CD pipeline | `INF` | P0 | 4 | - | Repo terstruktur; pipeline lint, test, & Docker build berjalan otomatis di setiap PR. |
-| `INF-02` | Deploy & konfigurasi Kong/Nginx API Gateway (SSL, Rate Limit, Routing) | `INF` | P0 | 4 | `INF-01` | Rute `/api/v1/core/*`, `/engine/*`, `/ai/*` terpisah dengan TLS & rate limit aktif. |
-| `INF-03` | Provisioning PostgreSQL 16+, Redis Cluster, & MinIO S3 (Private Network) | `INF` | P0 | 5 | `INF-01` | DB, Redis, & MinIO hanya dapat diakses dari internal network; backup otomatis terjadwal. |
-| `DB-01` | Setup Single Migration Tool & DDL awal skema `iam_master`, `academic_lms`, `finance_analytics` | `DB` | P0 | 5 | `INF-03` | Seluruh tabel inti Fase 1 (users, RBAC, students, classrooms, invoices) termigrasi bersih. |
-| `CORE-01` | Implementasi Modul IAM/SSO (JWT RS256 `private.pem`, Refresh Token, RBAC Guards) | `CORE` | P0 | 6 | `DB-01` | Login menghasilkan JWT RS256 valid; endpoint memblokir akses lintas peran (RBAC). |
-| `CORE-02` | Integrasi MinIO *Presigned URL* & BullMQ Notification Dispatcher (Email/WA/FCM) | `CORE` | P1 | 4 | `INF-03`, `CORE-01` | Upload/download berkas privat aman via presigned URL; antrean notif asinkron berjalan. |
-| `CORE-03` | Implementasi Modul E-PPDB & *One-Click Migration* ke Buku Induk SIAKAD | `CORE` | P0 | 8 | `CORE-01`, `CORE-02` | Data pendaftar yang diterima otomatis menjadi baris `students` aktif & akun siswa terbuat. |
-| `CORE-04` | Implementasi Modul SIAKAD Dasar (Buku Induk, Tahun Ajaran, Rombel, Mapel, Dapodik Export) | `CORE` | P0 | 8 | `CORE-03` | Admin dapat mengelola kelas/rombel, mutasi siswa, dan ekspor format siap Dapodik/EMIS. |
-| `CORE-05` | Implementasi Modul E-Finance (Generator Tagihan SPP, Webhook Payment Gateway VA/QRIS, Kas/BOS) | `CORE` | P0 | 8 | `CORE-01`, `DB-01` | Pembayaran VA/QRIS tervalidasi HMAC webhook dan otomatis mengubah status `invoices` → `PAID`. |
-| `WEB-01` | Setup React + Vite + TS Shell, Auth SSO, & Manajemen Pengguna/RBAC | `WEB` | P0 | 5 | `CORE-01` | Pengguna login sekali dan mendapat menu dinamis sesuai role. |
-| `WEB-02` | Bangun UI Portal E-PPDB & Modul Admin SIAKAD Dasar | `WEB` | P0 | 10 | `WEB-01`, `CORE-03`, `CORE-04` | Alur pendaftaran siswa baru hingga penempatan rombel berjalan E2E di browser. |
-| `WEB-03` | Bangun UI E-Finance (Manajemen Tagihan SPP, Pembayaran, & Laporan BOS) | `WEB` | P0 | 7 | `WEB-01`, `CORE-05` | Bendahara dapat membuat tagihan massal & memantau rekonsiliasi pembayaran *real-time*. |
-| `QA-01` | E2E Test, RBAC Security Check, & Payment Webhook Idempotency Test Fase 1 | `QA` | P0 | 5 | `WEB-02`, `WEB-03` | 0 temuan *broken access control*; webhook duplikat tidak menggandakan pencatatan bayar. |
+| ID | Sprint | Tugas (Task) | Stream | Prioritas | Est. (MD) | Dependensi | Kriteria Penerimaan (Acceptance Criteria) |
+| :--- | :---: | :--- | :---: | :---: | :---: | :--- | :--- |
+| `INF-01` | `S1` | Setup Monorepo, Docker Compose lokal, & CI/CD pipeline | `INF` | P0 | 4 | - | Repo terstruktur; pipeline lint, test, & Docker build berjalan otomatis di setiap PR. |
+| `INF-02` | `S1` | Deploy & konfigurasi Kong/Nginx API Gateway (SSL, Rate Limit, Routing) | `INF` | P0 | 4 | `INF-01` | Rute `/api/v1/core/*`, `/engine/*`, `/ai/*` terpisah dengan TLS & rate limit aktif. |
+| `INF-03` | `S1` | Provisioning PostgreSQL 16+, Redis Cluster, & MinIO S3 (Private Network) | `INF` | P0 | 5 | `INF-01` | DB, Redis, & MinIO hanya dapat diakses dari internal network; backup otomatis terjadwal. |
+| `DB-01` | `S1–2` | Setup Single Migration Tool & DDL awal skema `iam_master`, `academic_lms`, `finance_analytics` | `DB` | P0 | 5 | `INF-03` | Seluruh tabel inti Fase 1 (`users`, RBAC, `students`, `classrooms`, `invoices`) termigrasi bersih. |
+| `DB-01B` | `S3` | Migrasi DDL ekstensi E-PPDB & Buku Induk (`ppdb_waves`, `ppdb_quotas`, `ppdb_application_documents`, `ppdb_scores`, `student_profiles`, `student_enrollments`, `student_mutations`, `student_data_change_requests`, `official_letters`) | `DB` | P0 | 4 | `DB-01` | Seluruh tabel biodata Dapodik/EMIS, gelombang/kuota, skor seleksi, riwayat rombel, & surat resmi terpasang tanpa konflik. |
+| `DB-01C` | `S5` | Migrasi DDL Master Data SIAKAD (`school_profiles`, `academic_calendars`, `curricula`, `learning_objectives`, `teaching_assignments`, `rooms`, `bell_slots`, `extracurriculars`, `p5_projects`, `grade_weights`) | `DB` | P0 | 3 | `DB-01` | Seluruh tabel master profil sekolah, kalender libur, kurikulum/CP/TP, plotting JP, ruang, slot bel, & formula nilai terpasang. |
+| `CORE-01` | `S2` | Implementasi Modul IAM/SSO (JWT RS256 `private.pem`, Refresh Token, RBAC Guards) | `CORE` | P0 | 6 | `DB-01` | Login menghasilkan JWT RS256 valid; endpoint memblokir akses lintas peran (RBAC). |
+| `CORE-02` | `S2` | Integrasi MinIO *Presigned URL* & BullMQ Notification Dispatcher (Email/WA/FCM) | `CORE` | P1 | 4 | `INF-03`, `CORE-01` | Upload/download berkas privat aman via presigned URL; antrean notif asinkron berjalan. |
+| `CORE-03A` | `S3` | E-PPDB Setup, Pendaftaran Multi-Step, Zonasi Geospasial, & Billing Formulir | `CORE` | P0 | 6 | `CORE-01`, `CORE-02`, `DB-01B` | Konfigurasi gelombang/kuota/syarat dinamis, *save draft*, *duplicate guard* NIK/NISN, kalkulator jarak Haversine, & tagihan `PPDB_FEE`. |
+| `CORE-03B` | `S4` | Verifikasi Berkas per Dokumen (`NEED_REVISION`), Seleksi/Ranking, Daftar Ulang, & *Waiting List* | `CORE` | P0 | 6 | `CORE-03A` | Status & catatan per dokumen memicu notif revisi WA/Email; papan peringkat zonasi/prestasi, SKL ber-QR, & promosi cadangan berjalan. |
+| `CORE-03C` | `S4` | Generator NIS Terstruktur & *One-Click / Batch Migration* ke Buku Induk | `CORE` | P0 | 5 | `CORE-03B` | Migrasi atomik mengisi `students` + `student_profiles`, menautkan multi-anak ke akun `ORANG_TUA`, inisialisasi dompet & kartu RFID/QR, serta penempatan rombel awal. |
+| `CORE-04A` | `S4` | Buku Induk 360°, Brankas Arsip Legalitas, & Manajemen Siklus Kartu RFID/QR | `CORE` | P0 | 6 | `CORE-03C` | Profil lengkap Dapodik/EMIS, timeline riwayat rombel/nilai/absensi/BK, *versioning* arsip MinIO, & blokir/ganti kartu RFID + invalidasi cache Redis. |
+| `CORE-04B` | `S5` | Siklus Mutasi Masuk/Keluar, Kenaikan Kelas Massal, & Generator Surat / Cetak PDF Buku Induk | `CORE` | P0 | 6 | `CORE-04A` | Mutasi keluar memblokir RFID & memicu *settlement* dompet; kenaikan kelas massal menjaga histori; PDF Buku Induk & surat ber-QR/TTE terbit. |
+| `CORE-04C` | `S6` | Impor Massal Excel/CSV, *Pre-Flight Validator*, & Ekspor XLSX Siap Dapodik/EMIS | `CORE` | P1 | 5 | `CORE-04A` | Validator mendeteksi NIK/NISN/Ibu Kandung kosong; impor siswa lama & ekspor format Dapodik/EMIS berjalan akurat. |
+| `CORE-04D` | `S5–6` | API Master Data SIAKAD Lengkap (Kurikulum, CP/TP, Kalender Libur, Ruang/Slot Bell, Plotting Guru & SK Tugas) | `CORE` | P0 | 6 | `DB-01C`, `CORE-04A` | Admin/Waka dapat mengelola master kurikulum, bank CP/TP, plotting JP guru + validasi beban mengajar, rombel mapel pilihan, & kalender libur. |
+| `CORE-05` | `S5–6` | Implementasi Modul E-Finance (Generator Tagihan SPP, Webhook Payment Gateway VA/QRIS, Kas/BOS) | `CORE` | P0 | 8 | `CORE-01`, `DB-01` | Pembayaran VA/QRIS tervalidasi HMAC webhook dan otomatis mengubah status `invoices` → `PAID`. |
+| `WEB-01` | `S2` | Setup React + Vite + TS Shell, Auth SSO, & Manajemen Pengguna/RBAC | `WEB` | P0 | 5 | `CORE-01` | Pengguna login sekali dan mendapat menu dinamis sesuai role. |
+| `WEB-02A` | `S3` | UI Portal E-PPDB Publik (*Multi-Step Wizard*, Map Picker Zonasi, Upload & Revisi Berkas, Status Bayar) | `WEB` | P0 | 6 | `WEB-01`, `CORE-03A` | Calon siswa mengisi draft bertahap, pin lokasi zonasi, bayar formulir, & unggah ulang berkas revisi. |
+| `WEB-02B` | `S4` | UI Panitia E-PPDB (Setup Gelombang/Kuota, *Split-View Verification Desk*, Papan Ranking, Batch Migration) | `WEB` | P0 | 6 | `WEB-02A`, `CORE-03B`, `CORE-03C` | Panitia meninjau preview dokumen berdampingan, meluluskan peserta, dan menjalankan migrasi massal. |
+| `WEB-02C` | `S5–6` | UI Buku Induk 360°, Alur Mutasi/Kenaikan Kelas, Cetak PDF/Surat, & Validator Dapodik | `WEB` | P0 | 7 | `WEB-01`, `CORE-04A`, `CORE-04B`, `CORE-04C` | Admin mengelola lembar Buku Induk 360°, mutasi, impor/ekspor Dapodik, & cetak PDF resmi dari browser. |
+| `WEB-02D` | `S6` | UI Master Data SIAKAD (Kurikulum/CP-TP, Kalender Akademik, Ruang/Bell, Plotting Guru & Mapel Pilihan) | `WEB` | P0 | 5 | `WEB-01`, `CORE-04D` | Waka Kurikulum & TU mengelola seluruh master data akademik dan plotting jam mengajar tanpa bentrok. |
+| `WEB-03` | `S5–6` | Bangun UI E-Finance (Manajemen Tagihan SPP, Pembayaran, & Laporan BOS) | `WEB` | P0 | 7 | `WEB-01`, `CORE-05` | Bendahara dapat membuat tagihan massal & memantau rekonsiliasi pembayaran *real-time*. |
+| `QA-01` | `S6` | E2E Test E-PPDB → Buku Induk → Master SIAKAD, RBAC Security Check, & Payment Webhook Idempotency Fase 1 | `QA` | P0 | 5 | `WEB-02B`, `WEB-02C`, `WEB-02D`, `WEB-03` | 0 temuan *broken access control*; alur daftar hingga migrasi NIS, mutasi, & plotting SIAKAD lulus E2E. |
 
 ### 9.2 Task List Fase 2: Mesin IoT Kehadiran, Penjadwalan Pintar, & Mobile Apps (Bulan 4 – 6)
 
-| ID | Tugas (Task) | Stream | Prioritas | Est. (MD) | Dependensi | Kriteria Penerimaan (Acceptance Criteria) |
-| :--- | :--- | :---: | :---: | :---: | :--- | :--- |
-| `INF-04` | Deploy Broker MQTT EMQX + TLS/Auth & Redis Streams Consumer Groups | `INF` | P0 | 4 | `INF-03` | EMQX menerima koneksi perangkat uji dengan autentikasi device ID & ACL topik. |
-| `DB-02` | Migrasi DDL `high_speed_ops.attendances` & indeks `identity_cards.rfid_uid` | `DB` | P0 | 3 | `DB-01` | Indeks komposit `(date, user_id)` & unique `rfid_uid` terpasang untuk lookup sub-ms. |
-| `ENG-01` | Bootstrap Service B (Rust/Axum), SQLx Pool, & Verifikasi JWT RS256 (`public.pem`) | `ENG` | P0 | 5 | `INF-02`, `CORE-01` | Service Rust memvalidasi token terbitan Node.js secara lokal tanpa query ke PostgreSQL. |
-| `ENG-02` | Implementasi Worker Ingesti MQTT Absensi RFID + Endpoint Batch Offline Sync | `ENG` | P0 | 7 | `ENG-01`, `INF-04`, `DB-02` | Validasi tap kartu `< 3 ms`, insert `attendances`, kirim ACK MQTT & publish `AttendanceRecorded`. |
-| `CORE-06` | Consumer Event `AttendanceRecorded` (FCM Push ke Ortu) & API Izin/Jurnal Guru | `CORE` | P0 | 6 | `ENG-02`, `CORE-02` | Notifikasi hadir/telat masuk ke ponsel orang tua `< 5 detik` setelah tap kartu di gerbang. |
-| `AI-01` | Bootstrap Service C (Python/FastAPI) & Verifikasi JWT RS256 (`public.pem`) | `AI` | P0 | 3 | `INF-02`, `CORE-01` | Endpoint `/api/v1/ai/*` dapat diakses dengan token SSO dan terhubung ke PG & Redis. |
-| `AI-02` | Implementasi Engine Auto-Scheduling (Google OR-Tools CP-SAT Solver) | `AI` | P0 | 10 | `AI-01`, `CORE-04` | Menghasilkan jadwal ke `schedules` dengan **0 bentrok** guru/kelas/lab & kirim event `ScheduleGenerated`. |
-| `CORE-07` | Integrasi Trigger & Review Jadwal Otomatis di SIAKAD (`Node.js ↔ Python`) | `CORE` | P1 | 4 | `AI-02` | Waka Kurikulum dapat menekan "Susun Jadwal Otomatis" dan memantau progres hingga aktif. |
-| `WEB-04` | Bangun UI Manajemen Jadwal Pintar & Monitoring Kehadiran Live di Web SIAKAD | `WEB` | P1 | 6 | `CORE-06`, `CORE-07` | Admin melihat matriks jadwal tanpa bentrok serta rekap presensi harian siswa & guru. |
-| `IOT-01` | Pengembangan Firmware ESP32 Terminal RFID (MQTT + Flash Offline Ring Buffer) | `IOT` | P0 | 8 | `INF-04`, `ENG-02` | Perangkat membaca RFID, menyalakan LED/buzzer, dan menyimpan antrean lokal saat Wi-Fi mati. |
-| `MOB-01` | Setup Monorepo Flutter (3 Flavors), Shared Auth RS256, FCM, & Dynamic QR SDK | `MOB` | P0 | 6 | `CORE-01` | Fondasi 3 aplikasi mobile siap dengan SSO login, refresh token, dan generator QR dinamis. |
-| `MOB-02` | Bangun Fitur V1 Parent App (Notif Hadir, Izin Digital, Pantau Nilai/SPP) | `MOB` | P0 | 8 | `MOB-01`, `CORE-06` | Orang tua menerima notif tap kartu *real-time* & dapat mengajukan izin sakit/izin digital. |
-| `MOB-03` | Bangun Fitur V1 Teacher App (Presensi GPS Mapbox + Swafoto, Jurnal `< 1 mnt`) & Student App | `MOB` | P0 | 9 | `MOB-01`, `CORE-06` | Guru absen dalam radius GPS sekolah + swafoto ke MinIO; siswa melihat Kartu Digital & jadwal. |
-| `QA-02` | Uji Burst MQTT 1.500 Tap Kartu, Uji Offline Sync ESP32, & Verifikasi Solver Jadwal | `QA` | P0 | 5 | `IOT-01`, `AI-02`, `MOB-02` | 0 data tap hilang saat simulasi putus internet; 0 bentrok pada hasil jadwal OR-Tools. |
+| ID | Sprint | Tugas (Task) | Stream | Prioritas | Est. (MD) | Dependensi | Kriteria Penerimaan (Acceptance Criteria) |
+| :--- | :---: | :--- | :---: | :---: | :---: | :--- | :--- |
+| `INF-04` | `S7` | Deploy Broker MQTT EMQX + TLS/Auth & Redis Streams Consumer Groups | `INF` | P0 | 4 | `INF-03` | EMQX menerima koneksi perangkat uji dengan autentikasi device ID & ACL topik. |
+| `DB-02` | `S7` | Migrasi DDL `high_speed_ops.attendances` & indeks `identity_cards.rfid_uid` | `DB` | P0 | 3 | `DB-01` | Indeks komposit `(date, user_id)` & unique `rfid_uid` terpasang untuk lookup sub-ms. |
+| `ENG-01` | `S7` | Bootstrap Service B (Rust/Axum), SQLx Pool, & Verifikasi JWT RS256 (`public.pem`) | `ENG` | P0 | 5 | `INF-02`, `CORE-01` | Service Rust memvalidasi token terbitan Node.js secara lokal tanpa query ke PostgreSQL. |
+| `ENG-02` | `S8` | Implementasi Worker Ingesti MQTT Absensi RFID + Endpoint Batch Offline Sync | `ENG` | P0 | 7 | `ENG-01`, `INF-04`, `DB-02` | Validasi tap kartu `< 3 ms`, insert `attendances`, kirim ACK MQTT & publish `AttendanceRecorded`. |
+| `CORE-06` | `S9` | Consumer `AttendanceRecorded` (FCM Push Ortu), Approval Izin Digital, Jurnal KBM `< 1 mnt`, & Presensi Mapel | `CORE` | P0 | 6 | `ENG-02`, `CORE-02`, `CORE-04D` | Notif tap masuk `< 5 dtk`; guru isi jurnal + absen per mapel; wali kelas setujui izin sakit ortu & Waka pantau keterlaksanaan KBM. |
+| `AI-01` | `S7` | Bootstrap Service C (Python/FastAPI) & Verifikasi JWT RS256 (`public.pem`) | `AI` | P0 | 3 | `INF-02`, `CORE-01` | Endpoint `/api/v1/ai/*` dapat diakses dengan token SSO dan terhubung ke PG & Redis. |
+| `AI-02` | `S8–9` | Implementasi Engine Auto-Scheduling (Google OR-Tools CP-SAT Solver) | `AI` | P0 | 10 | `AI-01`, `CORE-04D` | Menghasilkan jadwal ke `schedules` dengan **0 bentrok** guru/kelas/lab & kirim event `ScheduleGenerated`. |
+| `CORE-07` | `S10` | Integrasi Trigger Jadwal Otomatis, Editor Manual Anti-Bentrok, & Manajemen Guru Pengganti/Piket (`Node.js ↔ Python`) | `CORE` | P1 | 5 | `AI-02` | Waka Kurikulum dapat generate jadwal, geser slot manual dengan validasi bentrok, dan tugaskan guru piket harian. |
+| `WEB-04` | `S10` | Bangun UI Manajemen Jadwal Pintar (*Drag-and-Drop*), Guru Piket, Monitoring KBM, & Kehadiran Live SIAKAD | `WEB` | P1 | 6 | `CORE-06`, `CORE-07` | Admin mengelola matriks jadwal, penugasan piket, progress jurnal KBM, & rekap presensi harian siswa/guru. |
+| `IOT-01` | `S8–9` | Pengembangan Firmware ESP32 Terminal RFID (MQTT + Flash Offline Ring Buffer) | `IOT` | P0 | 8 | `INF-04`, `ENG-02` | Perangkat membaca RFID, menyalakan LED/buzzer, dan menyimpan antrean lokal saat Wi-Fi mati. |
+| `MOB-01` | `S10` | Setup Monorepo Flutter (3 Flavors), Shared Auth RS256, FCM, & Dynamic QR SDK | `MOB` | P0 | 6 | `CORE-01` | Fondasi 3 aplikasi mobile siap dengan SSO login, refresh token, dan generator QR dinamis. |
+| `MOB-02` | `S11` | Bangun Fitur V1 Parent App (Notif Hadir, Izin Digital, Pantau Nilai/SPP) | `MOB` | P0 | 8 | `MOB-01`, `CORE-06` | Orang tua menerima notif tap kartu *real-time* & dapat mengajukan izin sakit/izin digital. |
+| `MOB-03` | `S11–12` | Bangun Fitur V1 Teacher App (Presensi GPS Mapbox + Swafoto, Jurnal `< 1 mnt`) & Student App | `MOB` | P0 | 9 | `MOB-01`, `CORE-06` | Guru absen dalam radius GPS sekolah + swafoto ke MinIO; siswa melihat Kartu Digital & jadwal. |
+| `QA-02` | `S12` | Uji Burst MQTT 1.500 Tap Kartu, Uji Offline Sync ESP32, & Verifikasi Solver Jadwal | `QA` | P0 | 5 | `IOT-01`, `AI-02`, `MOB-02` | 0 data tap hilang saat simulasi putus internet; 0 bentrok pada hasil jadwal OR-Tools. |
 
 ### 9.3 Task List Fase 3: Pembelajaran Digital & Mesin Ujian CBT Berkinerja Tinggi (Bulan 7 – 9)
 
-| ID | Tugas (Task) | Stream | Prioritas | Est. (MD) | Dependensi | Kriteria Penerimaan (Acceptance Criteria) |
-| :--- | :--- | :---: | :---: | :---: | :--- | :--- |
-| `DB-03` | Migrasi DDL `cbt_exams`, `cbt_questions`, `cbt_student_submissions`, & `e_rapor_documents` | `DB` | P0 | 4 | `DB-01` | Skema CBT & E-Rapor TTE siap dengan constraint unik per `(exam_id, student_id)`. |
-| `CORE-08` | Implementasi Modul LMS (Materi, Video Streaming MinIO, Tugas, Forum, Bank Soal CBT) | `CORE` | P0 | 10 | `DB-03`, `CORE-02` | Guru dapat mengunggah materi/video, mengelola tugas, dan menyusun bank soal untuk CBT. |
-| `ENG-03` | Implementasi CBT Pre-Warmer (H-15m Enkripsi Redis) & Pengacakan Soal per Siswa | `ENG` | P0 | 6 | `ENG-01`, `DB-03`, `CORE-08` | Paket soal ujian masuk ke Redis terenkripsi sebelum jam mulai; urutan soal unik tiap siswa. |
-| `ENG-04` | Implementasi CBT Live Engine (WebSocket/Fast HTTP Sync, Exam Lock Heartbeat, Auto-Grader) | `ENG` | P0 | 9 | `ENG-03` | Jawaban tersimpan ke Redis + *batch flush* PG; auto-grading menghitung skor saat submit. |
-| `CORE-09` | Consumer `CbtExamSubmitted`, Modul Penilaian Akhir & Generator PDF E-Rapor ber-TTE | `CORE` | P0 | 8 | `ENG-04`, `CORE-04` | Nilai CBT otomatis masuk rekap SIAKAD; PDF E-Rapor ditandatangani TTE & tersimpan di MinIO. |
-| `ENG-05` | Implementasi Sinkronisasi Jadwal Automated IP Bell (`schedules` → MQTT/HTTP Bel) | `ENG` | P1 | 4 | `ENG-01`, `AI-02` | Perubahan jadwal di Python otomatis memperbarui jadwal bunyi bel jaringan sekolah. |
-| `WEB-05` | Bangun UI Portal LMS (Guru/Siswa), Antarmuka Ujian CBT (Exam Lock), & Cetak E-Rapor | `WEB` | P0 | 10 | `CORE-08`, `ENG-04`, `CORE-09` | Siswa mengerjakan ujian CBT di browser terkunci; guru mengelola nilai dan E-Rapor TTE. |
-| `MOB-04` | Update Student App (Materi & Pengingat Tugas LMS) & Parent App (Unduh E-Rapor) | `MOB` | P1 | 6 | `CORE-08`, `CORE-09` | Siswa mendapat pengingat tugas LMS; orang tua dapat melihat/mengunduh PDF E-Rapor. |
-| `IOT-02` | Integrasi Perangkat IP Bell, Digital Signage Lobi, & Smartboard Kelas (SSO LMS) | `IOT` | P2 | 6 | `ENG-05`, `CORE-08` | Bel berbunyi tepat waktu sesuai jadwal; guru login ke Smartboard langsung mengakses materi LMS. |
-| `INF-05` | Paketkan Deployment Edge Mini-Server untuk Binari Rust CBT (~20 MB) & Sinkronisasi | `INF` | P1 | 4 | `ENG-04` | Node CBT Rust dapat dideploy di mini-server lokal sekolah dan melakukan sinkronisasi hasil. |
-| `QA-03` | Load Test k6 `1.000+` Peserta CBT Serentak & Uji Keamanan Exam Browser Lock | `QA` | P0 | 6 | `ENG-04`, `WEB-05` | CPU & RAM server `< 20%` saat 1.000 siswa aktif serentak; pelanggaran fokus tercatat akurat. |
+| ID | Sprint | Tugas (Task) | Stream | Prioritas | Est. (MD) | Dependensi | Kriteria Penerimaan (Acceptance Criteria) |
+| :--- | :---: | :--- | :---: | :---: | :---: | :--- | :--- |
+| `DB-03` | `S13` | Migrasi DDL Smart LMS (`lms_courses`, `lms_modules`, `lms_module_blocks`, `lms_adaptive_rules`, `lms_student_progress`, `lms_learning_events`), CBT (`cbt_exams`, `cbt_questions`, `cbt_student_submissions`), & E-Rapor (`grade_locks`, `extracurricular_enrollments`, `p5_assessments`, `homeroom_notes`, `e_rapor_documents`) | `DB` | P0 | 5 | `DB-01C` | Skema blok modul dinamis, telemetri belajar, CBT, & E-Rapor Kurikulum Merdeka/K-13 siap tanpa konflik. |
+| `CORE-08` | `S13–14` | Implementasi Smart LMS Core & Dynamic Module Composer (Auto-Sync Kelas SIAKAD, Blok JSONB + Tag TP/Bloom, *Conditional Adaptive Path*, Template MGMP, Video MinIO, Rubrik, Bank Soal AKM, & Pipa Telemetri) | `CORE` | P0 | 12 | `DB-03`, `CORE-02` | Guru menyusun modul dinamis bertag TP/Bloom, mengatur cabang remedial/pengayaan, mengunggah video/tugas rubrik, menyusun soal AKM, & merekam `lms_learning_events`. |
+| `ENG-03` | `S15` | Implementasi CBT Pre-Warmer (H-15m Enkripsi Redis) & Pengacakan Soal per Siswa | `ENG` | P0 | 6 | `ENG-01`, `DB-03`, `CORE-08` | Paket soal ujian masuk ke Redis terenkripsi sebelum jam mulai; urutan soal unik tiap siswa. |
+| `ENG-04` | `S15–16` | Implementasi CBT Live Engine (WebSocket/Fast HTTP Sync, Exam Lock Heartbeat, Auto-Grader) | `ENG` | P0 | 9 | `ENG-03` | Jawaban tersimpan ke Redis + *batch flush* PG; auto-grading menghitung skor saat submit. |
+| `CORE-09B` | `S16` | Orkestrasi *Placement Test* E-PPDB di Rust CBT & Penjadwalan Ruang/Pengawas Ujian Sekolah | `CORE` | P1 | 5 | `ENG-04`, `CORE-03B` | Peserta E-PPDB ikut tes di Rust CBT (`ppdb_scores`); panitia atur ruang/pengawas ujian & cetak kartu peserta ujian. |
+| `CORE-09` | `S17` | Consumer `CbtExamSubmitted`, *Auto-Sync* Nilai LMS/CBT, Remedial KKTP, Generator Deskripsi TP, P5, Ekskul & S/I/A Otomatis | `CORE` | P0 | 8 | `ENG-04`, `CORE-04D` | Nilai LMS/CBT masuk otomatis; remedial KKTP & narasi deskripsi TP terhitung; P5, ekskul, & rekap absensi S/I/A tersusun. |
+| `CORE-09C` | `S17–18` | Workspace Wali Kelas, *Lock/Unlock* Nilai Waka, Leger Nilai, Generator PDF E-Rapor ber-TTE (BSrE) + QR, & *Bridge* e-Rapor Kemendikbud/RDM | `CORE` | P0 | 7 | `CORE-09` | Waka mengunci nilai, leger kelas/angkatan terbit, PDF E-Rapor Intrakurikuler & P5 ditandatangani TTE + QR verifikasi, serta ekspor format e-Rapor/RDM. |
+| `ENG-05` | `S17` | Implementasi Sinkronisasi Jadwal Automated IP Bell (`schedules` → MQTT/HTTP Bel) | `ENG` | P1 | 4 | `ENG-01`, `AI-02` | Perubahan jadwal di Python otomatis memperbarui jadwal bunyi bel jaringan sekolah. |
+| `WEB-05` | `S17–18` | Bangun UI Smart LMS (*Block-Based Module Composer*, Adaptive Rules, Video/Tugas/Forum), Ujian CBT (*Exam Lock*), Grid Nilai/Remedial/P5, Workspace Wali Kelas, Leger, & Cetak E-Rapor TTE | `WEB` | P0 | 12 | `CORE-08`, `ENG-04`, `CORE-09`, `CORE-09C` | Guru merakit modul dinamis bertag TP; siswa belajar adaptif & ujian CBT terkunci; wali kelas & kepsek rilis PDF E-Rapor TTE. |
+| `MOB-04` | `S18` | Update Student App (Materi & Pengingat Tugas LMS) & Parent App (Unduh E-Rapor) | `MOB` | P1 | 6 | `CORE-08`, `CORE-09` | Siswa mendapat pengingat tugas LMS; orang tua dapat melihat/mengunduh PDF E-Rapor. |
+| `IOT-02` | `S18` | Integrasi Perangkat IP Bell, Digital Signage Lobi, & Smartboard Kelas (SSO LMS) | `IOT` | P2 | 6 | `ENG-05`, `CORE-08` | Bel berbunyi tepat waktu sesuai jadwal; guru login ke Smartboard langsung mengakses materi LMS. |
+| `INF-05` | `S17` | Paketkan Deployment Edge Mini-Server untuk Binari Rust CBT (~20 MB) & Sinkronisasi | `INF` | P1 | 4 | `ENG-04` | Node CBT Rust dapat dideploy di mini-server lokal sekolah dan melakukan sinkronisasi hasil. |
+| `QA-03` | `S18` | Load Test k6 `1.000+` Peserta CBT Serentak & Uji Keamanan Exam Browser Lock | `QA` | P0 | 6 | `ENG-04`, `WEB-05` | CPU & RAM server `< 20%` saat 1.000 siswa aktif serentak; pelanggaran fokus tercatat akurat. |
 
 ### 9.4 Task List Fase 4: Ekosistem Kantin Cashless, Layanan Kesiswaan, & Kecerdasan EWS (Bulan 10 – 12)
 
-| ID | Tugas (Task) | Stream | Prioritas | Est. (MD) | Dependensi | Kriteria Penerimaan (Acceptance Criteria) |
-| :--- | :--- | :---: | :---: | :---: | :--- | :--- |
-| `DB-04` | Migrasi DDL `wallets`, `wallet_transactions`, `ews_student_risk_scores`, & tabel BK/UKS/Perpus/Asset | `DB` | P0 | 4 | `DB-01` | Kolom saldo bertipe `BIGINT`, `idempotency_key` Unique, dan tabel kesiswaan termigrasi. |
-| `ENG-06` | Implementasi Core Wallet & POS Kantin (`SELECT ... FOR UPDATE`, Batas Harian, Idempotency) | `ENG` | P0 | 8 | `ENG-01`, `DB-04` | Pemotongan saldo `< 5 ms`; `0%` saldo minus; tap ganda pada detik sama ditolak otomatis. |
-| `CORE-10` | Top-up Saldo QRIS → Rust Credit, Config Daily Limit Ortu, & Notif Rincian Jajan (`WalletDeducted`) | `CORE` | P0 | 6 | `ENG-06`, `CORE-05` | Orang tua isi saldo & atur limit harian; notifikasi item jajanan terkirim setelah transaksi POS. |
-| `CORE-11` | Implementasi Modul E-BK (Enkripsi AES-256), E-UKS, & Alumni Tracer Study | `CORE` | P1 | 8 | `DB-04`, `CORE-01` | Data konseling BK terenkripsi di DB; rekam medis/alergi UKS & survei alumni berfungsi penuh. |
-| `CORE-12` | Implementasi Modul E-Library (OPAC, Sirkulasi, E-Book) & Asset/Sarpras (QR + Ticketing) | `CORE` | P1 | 8 | `DB-04`, `CORE-02` | Katalog OPAC, peminjaman buku, scan QR aset, dan tiket perbaikan sarpras berjalan E2E. |
-| `AI-03` | Implementasi Engine Early Warning System (Job 08.00 WIB Pandas/Scikit-learn) & Rekomendasi LMS | `AI` | P0 | 9 | `AI-01`, `DB-04`, `CORE-09` | Skor `attendance_risk_score` & `academic_drop_score` terhitung harian dan publish `EwsAlertRaised`. |
-| `AI-04` | Implementasi Endpoint Agregasi Analitik Berat Dashboard Kepala Sekolah & Yayasan | `AI` | P1 | 5 | `AI-03` | API menyajikan tren akademik, kedisiplinan, dan arus kas sekolah secara agregat `< 500 ms`. |
-| `WEB-06` | Bangun UI Aplikasi Kasir POS Kantin, Layanan E-BK/UKS/Perpus/Sarpras, & Kios Mandiri UI | `WEB` | P0 | 10 | `ENG-06`, `CORE-11`, `CORE-12` | Kasir kantin memproses bayar RFID/QR; siswa dapat meminjam buku & cetak surat di Kios. |
-| `WEB-07` | Bangun UI Executive Dashboard Kepala Sekolah & Yayasan dengan Panel Alert EWS | `WEB` | P0 | 7 | `AI-03`, `AI-04` | Grafik performa sekolah & daftar siswa berisiko (`CRITICAL`/`MEDIUM`) tampil interaktif. |
-| `MOB-05` | Update Parent App (Top-up Dompet, Limit Jajan, Riwayat Kantin) & Student App (Booking BK, Perpus) | `MOB` | P0 | 7 | `CORE-10`, `CORE-11`, `CORE-12` | Orang tua mengontrol jajan anak dari ponsel; siswa dapat memesan konseling & cek pinjaman buku. |
-| `IOT-03` | Integrasi Perangkat Keras POS Kantin (RFID/QRIS Reader) & Kios Mandiri (Scanner + Thermal Printer) | `IOT` | P1 | 6 | `ENG-06`, `WEB-06` | Perangkat POS & Kios berfungsi stabil di lingkungan operasional kantin dan perpustakaan. |
-| `QA-04` | Concurrency/Race-Condition Test POS Wallet, Penetration Test Penuh, & Final UAT Produksi | `QA` | P0 | 7 | Seluruh modul Fase 4 | Lulus uji 50 request paralel POS tanpa saldo minus; 0 temuan kerentanan kritikal/tinggi. |
+| ID | Sprint | Tugas (Task) | Stream | Prioritas | Est. (MD) | Dependensi | Kriteria Penerimaan (Acceptance Criteria) |
+| :--- | :---: | :--- | :---: | :---: | :---: | :--- | :--- |
+| `DB-04` | `S19` | Migrasi DDL `wallets`, `wallet_transactions`, `ews_student_risk_scores`, `lms_item_calibration`, `lms_student_mastery_profiles`, & tabel BK/UKS/Perpus/Asset | `DB` | P0 | 4 | `DB-01` | Kolom saldo bertipe `BIGINT`, `idempotency_key` Unique, tabel analitik ML LMS, dan tabel kesiswaan termigrasi. |
+| `ENG-06` | `S19–20` | Implementasi Core Wallet & POS Kantin (`SELECT ... FOR UPDATE`, Batas Harian, Idempotency) | `ENG` | P0 | 8 | `ENG-01`, `DB-04` | Pemotongan saldo `< 5 ms`; `0%` saldo minus; tap ganda pada detik sama ditolak otomatis. |
+| `CORE-10` | `S20` | Top-up Saldo QRIS → Rust Credit, Config Daily Limit Ortu, & Notif Rincian Jajan (`WalletDeducted`) | `CORE` | P0 | 6 | `ENG-06`, `CORE-05` | Orang tua isi saldo & atur limit harian; notifikasi item jajanan terkirim setelah transaksi POS. |
+| `CORE-11` | `S21` | Implementasi Modul E-BK (Enkripsi AES-256), E-UKS (Sinkron Buku Induk), Kelulusan Massal & Alumni Tracer Study | `CORE` | P1 | 8 | `DB-04`, `CORE-01`, `CORE-04B` | Data konseling BK terenkripsi; alergi UKS sinkron ke Buku Induk; kelulusan massal mengubah status `GRADUATED` & masuk Alumni. |
+| `CORE-11B` | `S22` | API Self-Service Ubah Biodata Buku Induk (+ Approval TU) & Cetak Surat Aktif Kiosk | `CORE` | P1 | 4 | `CORE-04B` | Pengajuan ubah identitas legal masuk antrean TU; Kiosk mencetak Surat Keterangan Aktif ber-QR resmi. |
+| `CORE-12` | `S21–22` | Implementasi Modul E-Library (OPAC, Sirkulasi, E-Book) & Asset/Sarpras (QR + Ticketing) | `CORE` | P1 | 8 | `DB-04`, `CORE-02` | Katalog OPAC, peminjaman buku, scan QR aset, dan tiket perbaikan sarpras berjalan E2E. |
+| `AI-03` | `S23` | Implementasi EWS Hybrid → ML (`Scikit-learn` Job 08.00 WIB + Penjelasan Faktor Risiko) | `AI` | P0 | 8 | `AI-01`, `DB-04`, `CORE-09` | Skor `attendance_risk_score` & `academic_drop_score` terhitung harian dari presensi + LMS + nilai, dan publish `EwsAlertRaised`. |
+| `AI-03B` | `S23–24` | Implementasi ML Smart LMS Analytics (IRT Kalibrasi Soal, Deteksi *Bottleneck* Materi, *Knowledge Tracing* Mastery Radar TP, Clustering Gaya Belajar, & Rekomender Remedial) | `AI` | P0 | 9 | `AI-01`, `DB-04`, `CORE-08`, `ENG-04` | Analisis kualitas soal/blok materi (`lms_item_calibration`), peta penguasaan TP & klaster siswa (`lms_student_mastery_profiles`), serta trigger `LmsAdaptivePathTriggered`. |
+| `AI-04` | `S23` | Implementasi Endpoint Agregasi Analitik Berat Dashboard Kepala Sekolah & Yayasan | `AI` | P1 | 5 | `AI-03` | API menyajikan tren akademik, kedisiplinan, dan arus kas sekolah secara agregat `< 500 ms`. |
+| `CORE-13` | `S24` | Consumer `LmsAdaptivePathTriggered` & API Dashboard Analitik Materi/Mastery Guru | `CORE` | P1 | 4 | `AI-03B`, `CORE-08` | Sistem otomatis membuka modul remedial rekomendasi ML & menampilkan *Mastery Radar* serta alert kualitas soal ke guru. |
+| `WEB-06` | `S22` | Bangun UI Aplikasi Kasir POS Kantin, Layanan E-BK/UKS/Perpus/Sarpras, Approval Ubah Data, & Kios Mandiri UI | `WEB` | P0 | 10 | `ENG-06`, `CORE-11`, `CORE-11B`, `CORE-12` | Kasir kantin memproses bayar RFID/QR; TU menyetujui ubah biodata; siswa meminjam buku & cetak surat aktif di Kios. |
+| `WEB-07` | `S23–24` | Bangun UI Executive Dashboard Kepsek/Yayasan (EWS ML) & Dashboard Analitik Smart LMS Guru (*Mastery Radar*, IRT Soal, *Bottleneck* Materi) | `WEB` | P0 | 8 | `AI-03`, `AI-03B`, `AI-04`, `CORE-13` | Grafik performa sekolah, alert EWS beserta penyebab risiko, & insight ML kualitas materi/penguasaan TP siswa tampil interaktif. |
+| `MOB-05` | `S22` | Update Parent App (Top-up Dompet, Limit Jajan, Riwayat Kantin, Ajukan Ubah Biodata) & Student App (Booking BK, Perpus) | `MOB` | P0 | 7 | `CORE-10`, `CORE-11`, `CORE-11B`, `CORE-12` | Orang tua mengontrol jajan anak & ajukan koreksi biodata; siswa dapat memesan konseling & cek pinjaman buku. |
+| `IOT-03` | `S22` | Integrasi Perangkat Keras POS Kantin (RFID/QRIS Reader) & Kios Mandiri (Scanner + Thermal Printer) | `IOT` | P1 | 6 | `ENG-06`, `WEB-06` | Perangkat POS & Kios berfungsi stabil di lingkungan operasional kantin dan perpustakaan. |
+| `QA-04` | `S24` | Concurrency/Race-Condition Test POS Wallet, Penetration Test Penuh, & Final UAT Produksi | `QA` | P0 | 7 | Seluruh modul Fase 4 | Lulus uji 50 request paralel POS tanpa saldo minus; 0 temuan kerentanan kritikal/tinggi. |
 
 ---
 
