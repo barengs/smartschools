@@ -7,6 +7,10 @@ export interface AppConfig {
   redisHost: string;
   redisPort: number;
   redisPassword: string;
+  minioEndpoint: string;
+  minioAccessKey: string;
+  minioSecretKey: string;
+  minioRegion: string;
   jwtPrivateKey: string;
   jwtPublicKey: string;
   jwtAccessExpiresIn: string;
@@ -44,6 +48,10 @@ export function loadAppConfig(): AppConfig {
     redisHost: process.env.REDIS_HOST ?? 'localhost',
     redisPort: Number(process.env.REDIS_PORT ?? 6379),
     redisPassword: process.env.REDIS_PASSWORD ?? 'smartschool_redis_pass',
+    minioEndpoint: process.env.MINIO_ENDPOINT ?? 'http://localhost:9000',
+    minioAccessKey: process.env.MINIO_ROOT_USER ?? 'minioadmin',
+    minioSecretKey: process.env.MINIO_ROOT_PASSWORD ?? 'minioadmin_dev_pass',
+    minioRegion: process.env.MINIO_REGION ?? 'us-east-1',
     jwtPrivateKey: resolveKeyContent(
       process.env.JWT_PRIVATE_KEY_PATH,
       'infra/secrets/private.pem',
@@ -57,4 +65,3 @@ export function loadAppConfig(): AppConfig {
     jwtKeyId: process.env.JWT_KEY_ID ?? 'smartschool-key-1',
   };
 }
-

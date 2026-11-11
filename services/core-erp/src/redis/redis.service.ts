@@ -27,6 +27,19 @@ export class RedisService implements OnModuleDestroy {
     await this.client.del(key);
   }
 
+  async xadd(stream: string, fields: Record<string, string>, maxLen = 100_000): Promise<string> {
+    const flatArgs: string[] = [];
+    for (const [k, v] of Object.entries(fields)) {
+      flatArgs.push(k, v);
+    }
+    const id = await this.client.xadd(stream, 'MAXLEN', '~', String(maxLen), '*', ...flatArgs);
+    return id ?? '';
+  }
+
+  async lpush(key: string, value: string): Promise<number> {
+    return this.client.lpush(key, value);
+  }
+
   async ping(): Promise<boolean> {
     const res = await this.client.ping();
     return res === 'PONG';
@@ -36,4 +49,3 @@ export class RedisService implements OnModuleDestroy {
     await this.client.quit();
   }
 }
-
