@@ -113,3 +113,4 @@ export class SiakadController {
     return this.siakadService.createTeacher(dto);
   }
 }
+

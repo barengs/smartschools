@@ -9,3 +9,4 @@ import { FinanceService } from './finance.service';
   providers: [FinanceService],
 })
 export class FinanceModule {}
+

@@ -11,3 +11,4 @@ WORKDIR /app
 COPY --from=builder /app/target/release/high-speed-engine /usr/local/bin/high-speed-engine
 EXPOSE 3002
 CMD ["high-speed-engine"]
+

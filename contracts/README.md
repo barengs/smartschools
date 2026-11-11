@@ -14,3 +14,4 @@ Folder ini menyimpan kontrak komunikasi resmi lintas layanan (**Node.js**, **Rus
    - `school/{school_id}/gate/{device_id}/ack` (QoS 0)
    - `school/{school_id}/bell/{device_id}/schedule` (QoS 1, Retained)
    - `school/{school_id}/device/{device_id}/heartbeat` (QoS 0)
+

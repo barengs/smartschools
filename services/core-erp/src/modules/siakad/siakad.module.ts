@@ -9,3 +9,4 @@ import { SiakadService } from './siakad.service';
   providers: [SiakadService],
 })
 export class SiakadModule {}
+

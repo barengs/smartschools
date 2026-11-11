@@ -233,3 +233,4 @@ export class FinanceService {
     return `INV-${billingType}-${Date.now()}-${crypto.randomInt(1000, 9999)}`;
   }
 }
+

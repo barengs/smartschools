@@ -10,3 +10,4 @@ def test_ews_critical_and_low():
     assert critical.risk_level == "CRITICAL"
     assert critical.attendance_risk_score >= 70
     assert critical.academic_drop_score >= 70
+
