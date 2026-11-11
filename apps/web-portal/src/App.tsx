@@ -3,10 +3,12 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider, useAuth } from './auth/AuthContext';
 import { AppLayout } from './components/Layout';
 import { DashboardPage } from './pages/DashboardPage';
+import { FinancePage } from './pages/FinancePage';
 import { LoginPage } from './pages/LoginPage';
 import { MyPpdbPage } from './pages/MyPpdbPage';
 import { PpdbAdminPage } from './pages/PpdbAdminPage';
 import { PpdbPublicPage } from './pages/PpdbPublicPage';
+import { SiakadPage } from './pages/SiakadPage';
 import { UsersPage } from './pages/UsersPage';
 
 function RequireAuth({ children }: { children: React.ReactElement }) {
@@ -36,6 +38,8 @@ export function App() {
             <Route path="dashboard" element={<DashboardPage />} />
             <Route path="my-ppdb" element={<MyPpdbPage />} />
             <Route path="ppdb-admin" element={<PpdbAdminPage />} />
+            <Route path="siakad" element={<SiakadPage />} />
+            <Route path="finance" element={<FinancePage />} />
             <Route path="users" element={<UsersPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

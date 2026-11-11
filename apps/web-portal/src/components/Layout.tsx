@@ -16,6 +16,16 @@ const NAV_ITEMS: NavItem[] = [
     roles: ['SUPER_ADMIN', 'STAF_TU', 'KEPALA_SEKOLAH'],
   },
   {
+    to: '/siakad',
+    label: 'SIAKAD & Buku Induk',
+    roles: ['SUPER_ADMIN', 'WAKA_KURIKULUM', 'STAF_TU', 'KEPALA_SEKOLAH'],
+  },
+  {
+    to: '/finance',
+    label: 'E-Finance & SPP',
+    roles: ['SUPER_ADMIN', 'BENDAHARA', 'KEPALA_SEKOLAH', 'STAF_TU'],
+  },
+  {
     to: '/users',
     label: 'Pengguna & RBAC',
     roles: ['SUPER_ADMIN', 'STAF_TU', 'KEPALA_SEKOLAH'],
