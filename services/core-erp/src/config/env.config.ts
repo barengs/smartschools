@@ -11,6 +11,7 @@ export interface AppConfig {
   minioAccessKey: string;
   minioSecretKey: string;
   minioRegion: string;
+  paymentWebhookSecret: string;
   jwtPrivateKey: string;
   jwtPublicKey: string;
   jwtAccessExpiresIn: string;
@@ -52,6 +53,7 @@ export function loadAppConfig(): AppConfig {
     minioAccessKey: process.env.MINIO_ROOT_USER ?? 'minioadmin',
     minioSecretKey: process.env.MINIO_ROOT_PASSWORD ?? 'minioadmin_dev_pass',
     minioRegion: process.env.MINIO_REGION ?? 'us-east-1',
+    paymentWebhookSecret: process.env.PAYMENT_WEBHOOK_SECRET ?? 'smartschool_dev_webhook_secret',
     jwtPrivateKey: resolveKeyContent(
       process.env.JWT_PRIVATE_KEY_PATH,
       'infra/secrets/private.pem',
