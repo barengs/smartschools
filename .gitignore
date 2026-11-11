@@ -1,0 +1,25 @@
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+infra/secrets/*.pem
+infra/secrets/*.key
+
+# Dependencies & Build Artifacts
+node_modules/
+dist/
+build/
+.next/
+target/
+__pycache__/
+*.pyc
+.venv/
+venv/
+.dart_tool/
+.flutter-plugins*
+
+# Logs & OS
+*.log
+.DS_Store
+Thumbs.db
+

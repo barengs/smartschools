@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 560" width="1120" height="560" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#f1f5f9"/>
+    </linearGradient>
+    <filter id="sh2" x="-3%" y="-3%" width="106%" height="108%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0f172a" flood-opacity="0.07"/>
+    </filter>
+  </defs>
+
+  <rect width="1120" height="560" rx="12" fill="url(#bg2)"/>
+  <rect x="24" y="16" width="1072" height="48" rx="8" fill="#0f172a"/>
+  <text x="44" y="45" fill="#ffffff" font-size="16" font-weight="700">4 ALUR OPERASIONAL HARIAN SMART SCHOOL (CARA KERJA LINTAS MESIN)</text>
+
+  <!-- Scenario 1: Top-Left (Auto Schedule) -->
+  <rect x="24" y="80" width="524" height="222" rx="10" fill="#ffffff" stroke="#a7f3d0" stroke-width="1.5" filter="url(#sh2)"/>
+  <rect x="24" y="80" width="524" height="34" rx="10" fill="#047857"/>
+  <rect x="24" y="102" width="524" height="12" fill="#047857"/>
+  <text x="42" y="102" fill="#ffffff" font-size="13" font-weight="700">1. Penyusunan Jadwal Pelajaran Otomatis (0 Bentrok)</text>
+
+  <rect x="40" y="128" width="110" height="72" rx="7" fill="#eff6ff" stroke="#93c5fd"/>
+  <text x="95" y="147" text-anchor="middle" fill="#1d4ed8" font-size="10.5" font-weight="700">Langkah 1</text>
+  <text x="95" y="164" text-anchor="middle" fill="#334155" font-size="10">Waka Kurikulum</text>
+  <text x="95" y="178" text-anchor="middle" fill="#334155" font-size="10">klik "Susun Jadwal"</text>
+  <text x="95" y="192" text-anchor="middle" fill="#1d4ed8" font-size="9.5" font-weight="600">(Web / Node.js)</text>
+
+  <text x="160" y="168" fill="#64748b" font-size="16" font-weight="700">→</text>
+
+  <rect x="176" y="128" width="128" height="72" rx="7" fill="#ecfdf5" stroke="#6ee7b7"/>
+  <text x="240" y="147" text-anchor="middle" fill="#047857" font-size="10.5" font-weight="700">Langkah 2</text>
+  <text x="240" y="164" text-anchor="middle" fill="#334155" font-size="10">Solver OR-Tools</text>
+  <text x="240" y="178" text-anchor="middle" fill="#334155" font-size="10">cari jadwal optimal</text>
+  <text x="240" y="192" text-anchor="middle" fill="#047857" font-size="9.5" font-weight="600">(Python AI)</text>
+
+  <text x="314" y="168" fill="#64748b" font-size="16" font-weight="700">→</text>
+
+  <rect x="330" y="128" width="202" height="72" rx="7" fill="#fff1f2" stroke="#fda4af"/>
+  <text x="431" y="147" text-anchor="middle" fill="#be123c" font-size="10.5" font-weight="700">Langkah 3</text>
+  <text x="431" y="164" text-anchor="middle" fill="#334155" font-size="10">Jadwal tampil di App Guru/Siswa</text>
+  <text x="431" y="178" text-anchor="middle" fill="#334155" font-size="10">&amp; Bel IP Sekolah berbunyi otomatis</text>
+  <text x="431" y="192" text-anchor="middle" fill="#be123c" font-size="9.5" font-weight="600">(PostgreSQL + Redis + Rust Bell)</text>
+
+  <rect x="40" y="214" width="492" height="72" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="54" y="234" fill="#0f172a" font-size="11" font-weight="700">Manfaat Bagi Sekolah:</text>
+  <text x="54" y="252" fill="#475569" font-size="10.5">• Menyusun jadwal ratusan jam pelajaran &amp; lab tanpa bentrok dalam hitungan detik.</text>
+  <text x="54" y="270" fill="#475569" font-size="10.5">• Jadwal bel sekolah selalu sinkron otomatis ketika ada perubahan jam mengajar.</text>
+
+  <!-- Scenario 2: Top-Right (Gate Attendance + EWS) -->
+  <rect x="572" y="80" width="524" height="222" rx="10" fill="#ffffff" stroke="#fde68a" stroke-width="1.5" filter="url(#sh2)"/>
+  <rect x="572" y="80" width="524" height="34" rx="10" fill="#b45309"/>
+  <rect x="572" y="102" width="524" height="12" fill="#b45309"/>
+  <text x="590" y="102" fill="#ffffff" font-size="13" font-weight="700">2. Presensi Gerbang Pagi &amp; Deteksi Dini Siswa (06.30–08.00)</text>
+
+  <rect x="588" y="128" width="114" height="72" rx="7" fill="#fffbeb" stroke="#fcd34d"/>
+  <text x="645" y="147" text-anchor="middle" fill="#b45309" font-size="10.5" font-weight="700">Pukul 06.45</text>
+  <text x="645" y="164" text-anchor="middle" fill="#334155" font-size="10">Siswa tap kartu</text>
+  <text x="645" y="178" text-anchor="middle" fill="#334155" font-size="10">RFID di gerbang</text>
+  <text x="645" y="192" text-anchor="middle" fill="#b45309" font-size="9.5" font-weight="600">(ESP32 → EMQX)</text>
+
+  <text x="711" y="168" fill="#64748b" font-size="16" font-weight="700">→</text>
+
+  <rect x="726" y="128" width="126" height="72" rx="7" fill="#fff1f2" stroke="#fda4af"/>
+  <text x="789" y="147" text-anchor="middle" fill="#be123c" font-size="10.5" font-weight="700">&lt; 3 Milidetik</text>
+  <text x="789" y="164" text-anchor="middle" fill="#334155" font-size="10">Validasi hadir/telat</text>
+  <text x="789" y="178" text-anchor="middle" fill="#334155" font-size="10">&amp; kirim notif ke HP</text>
+  <text x="789" y="192" text-anchor="middle" fill="#be123c" font-size="9.5" font-weight="600">(Rust → Node FCM)</text>
+
+  <text x="861" y="168" fill="#64748b" font-size="16" font-weight="700">→</text>
+
+  <rect x="876" y="128" width="204" height="72" rx="7" fill="#ecfdf5" stroke="#6ee7b7"/>
+  <text x="978" y="147" text-anchor="middle" fill="#047857" font-size="10.5" font-weight="700">Pukul 08.00 (EWS)</text>
+  <text x="978" y="164" text-anchor="middle" fill="#334155" font-size="10">AI cek pola alfa &amp; nilai turun,</text>
+  <text x="978" y="178" text-anchor="middle" fill="#334155" font-size="10">kirim alarm ke Kepsek &amp; Guru BK</text>
+  <text x="978" y="192" text-anchor="middle" fill="#047857" font-size="9.5" font-weight="600">(Python EWS → Dashboard)</text>
+
+  <rect x="588" y="214" width="492" height="72" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="602" y="234" fill="#0f172a" font-size="11" font-weight="700">Manfaat Bagi Orang Tua &amp; Sekolah:</text>
+  <text x="602" y="252" fill="#475569" font-size="10.5">• Orang tua langsung mendapat notifikasi begitu anak masuk gerbang sekolah.</text>
+  <text x="602" y="270" fill="#475569" font-size="10.5">• Jika internet gerbang putus, mesin menyimpan antrean di memori &amp; kirim ulang otomatis.</text>
+
+  <!-- Scenario 3: Bottom-Left (CBT) -->
+  <rect x="24" y="320" width="524" height="222" rx="10" fill="#ffffff" stroke="#fda4af" stroke-width="1.5" filter="url(#sh2)"/>
+  <rect x="24" y="320" width="524" height="34" rx="10" fill="#be123c"/>
+  <rect x="24" y="342" width="524" height="12" fill="#be123c"/>
+  <text x="42" y="342" fill="#ffffff" font-size="13" font-weight="700">3. Ujian Serentak 1.000+ Siswa CBT Anti-Down</text>
+
+  <rect x="40" y="368" width="132" height="72" rx="7" fill="#eff6ff" stroke="#93c5fd"/>
+  <text x="106" y="387" text-anchor="middle" fill="#1d4ed8" font-size="10.5" font-weight="700">H-15 Menit</text>
+  <text x="106" y="404" text-anchor="middle" fill="#334155" font-size="10">Guru buat soal di LMS,</text>
+  <text x="106" y="418" text-anchor="middle" fill="#334155" font-size="10">Rust muat ke Redis</text>
+  <text x="106" y="432" text-anchor="middle" fill="#1d4ed8" font-size="9.5" font-weight="600">(Enkripsi Soal)</text>
+
+  <text x="181" y="408" fill="#64748b" font-size="16" font-weight="700">→</text>
+
+  <rect x="196" y="368" width="154" height="72" rx="7" fill="#fff1f2" stroke="#fda4af"/>
+  <text x="273" y="387" text-anchor="middle" fill="#be123c" font-size="10.5" font-weight="700">Saat Ujian (Serentak)</text>
+  <text x="273" y="404" text-anchor="middle" fill="#334155" font-size="10">Soal diacak per siswa,</text>
+  <text x="273" y="418" text-anchor="middle" fill="#334155" font-size="10">jawaban simpan real-time</text>
+  <text x="273" y="432" text-anchor="middle" fill="#be123c" font-size="9.5" font-weight="600">(Rust WS + Exam Lock)</text>
+
+  <text x="359" y="408" fill="#64748b" font-size="16" font-weight="700">→</text>
+
+  <rect x="374" y="368" width="158" height="72" rx="7" fill="#f0fdf4" stroke="#86efac"/>
+  <text x="453" y="387" text-anchor="middle" fill="#15803d" font-size="10.5" font-weight="700">Klik Selesai</text>
+  <text x="453" y="404" text-anchor="middle" fill="#334155" font-size="10">Skor dihitung mikrodetik</text>
+  <text x="453" y="418" text-anchor="middle" fill="#334155" font-size="10">&amp; masuk ke E-Rapor</text>
+  <text x="453" y="432" text-anchor="middle" fill="#15803d" font-size="9.5" font-weight="600">(Auto-Grader → SIAKAD)</text>
+
+  <rect x="40" y="454" width="492" height="72" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="54" y="474" fill="#0f172a" font-size="11" font-weight="700">Keunggulan Teknis:</text>
+  <text x="54" y="492" fill="#475569" font-size="10.5">• Beban CPU &amp; RAM server tetap di bawah 20% meski 1.000+ siswa klik "Mulai" bersamaan.</text>
+  <text x="54" y="510" fill="#475569" font-size="10.5">• Bisa dijalankan di Mini-Server lokal sekolah (~20 MB) agar ujian tetap aman tanpa internet.</text>
+
+  <!-- Scenario 4: Bottom-Right (POS Kantin) -->
+  <rect x="572" y="320" width="524" height="222" rx="10" fill="#ffffff" stroke="#93c5fd" stroke-width="1.5" filter="url(#sh2)"/>
+  <rect x="572" y="320" width="524" height="34" rx="10" fill="#1d4ed8"/>
+  <rect x="572" y="342" width="524" height="12" fill="#1d4ed8"/>
+  <text x="590" y="342" fill="#ffffff" font-size="13" font-weight="700">4. Transaksi Kantin Cashless (Anti-Dobel &amp; Anti-Minus)</text>
+
+  <rect x="588" y="368" width="136" height="72" rx="7" fill="#ccfbf1" stroke="#5eead4"/>
+  <text x="656" y="387" text-anchor="middle" fill="#0f766e" font-size="10.5" font-weight="700">Top-Up &amp; Limit</text>
+  <text x="656" y="404" text-anchor="middle" fill="#334155" font-size="10">Ortu isi saldo QRIS &amp;</text>
+  <text x="656" y="418" text-anchor="middle" fill="#334155" font-size="10">atur batas jajan harian</text>
+  <text x="656" y="432" text-anchor="middle" fill="#0f766e" font-size="9.5" font-weight="600">(Parent App → Node)</text>
+
+  <text x="733" y="408" fill="#64748b" font-size="16" font-weight="700">→</text>
+
+  <rect x="748" y="368" width="158" height="72" rx="7" fill="#fff1f2" stroke="#fda4af"/>
+  <text x="827" y="387" text-anchor="middle" fill="#be123c" font-size="10.5" font-weight="700">Tap di Kasir (&lt; 5 ms)</text>
+  <text x="827" y="404" text-anchor="middle" fill="#334155" font-size="10">Kunci baris dompet, cek</text>
+  <text x="827" y="418" text-anchor="middle" fill="#334155" font-size="10">saldo &amp; batas harian</text>
+  <text x="827" y="432" text-anchor="middle" fill="#be123c" font-size="9.5" font-weight="600">(Rust Atomic + Idempotent)</text>
+
+  <text x="915" y="408" fill="#64748b" font-size="16" font-weight="700">→</text>
+
+  <rect x="930" y="368" width="150" height="72" rx="7" fill="#eff6ff" stroke="#93c5fd"/>
+  <text x="1005" y="387" text-anchor="middle" fill="#1d4ed8" font-size="10.5" font-weight="700">Notifikasi Ortu</text>
+  <text x="1005" y="404" text-anchor="middle" fill="#334155" font-size="10">Kirim rincian makanan</text>
+  <text x="1005" y="418" text-anchor="middle" fill="#334155" font-size="10">&amp; sisa saldo ke HP Ortu</text>
+  <text x="1005" y="432" text-anchor="middle" fill="#1d4ed8" font-size="9.5" font-weight="600">(Redis → Node FCM)</text>
+
+  <rect x="588" y="454" width="492" height="72" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="602" y="474" fill="#0f172a" font-size="11" font-weight="700">Jaminan Keamanan Keuangan:</text>
+  <text x="602" y="492" fill="#475569" font-size="10.5">• Jika kartu siswa tertempel 2x di detik yang sama, transaksi kedua otomatis ditolak.</text>
+  <text x="602" y="510" fill="#475569" font-size="10.5">• Saldo disimpan dalam angka bulat Rupiah (BIGINT) agar 100% presisi tanpa selisih koma.</text>
+</svg>
+
