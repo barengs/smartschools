@@ -80,6 +80,24 @@ services:
     networks:
       - smartschool_net
 
+  emqx:
+    image: emqx/emqx:5-alpine
+    container_name: smartschool_emqx
+    restart: unless-stopped
+    ports:
+      - "${MQTT_PORT:-1883}:1883"
+      - "${MQTT_TLS_PORT:-8883}:8883"
+      - "${MQTT_DASHBOARD_PORT:-18083}:18083"
+    volumes:
+      - emqx_data:/opt/emqx/data
+    healthcheck:
+      test: ["CMD", "/opt/emqx/bin/emqx", "ctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - smartschool_net
+
   gateway:
     image: nginx:1.27-alpine
     container_name: smartschool_gateway
@@ -102,6 +120,7 @@ volumes:
   pg_data:
   redis_data:
   minio_data:
+  emqx_data:
 
 networks:
   smartschool_net:

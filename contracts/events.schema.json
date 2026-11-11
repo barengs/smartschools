@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SmartSchoolRedisStreamEvent",
+  "type": "object",
+  "required": ["event_id", "event_type", "occurred_at", "source", "payload"],
+  "properties": {
+    "event_id": { "type": "string", "format": "uuid" },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "AttendanceRecorded",
+        "WalletDeducted",
+        "CbtExamSubmitted",
+        "ScheduleGenerated",
+        "EwsAlertRaised",
+        "PpdbRegistered",
+        "StudentMigrated",
+        "InvoicePaid"
+      ]
+    },
+    "occurred_at": { "type": "string", "format": "date-time" },
+    "source": { "type": "string", "enum": ["node-erp", "rust-engine", "python-ai"] },
+    "payload": { "type": "object" }
+  }
+}
