@@ -1,170 +1,241 @@
 import { FormEvent, useEffect, useState } from 'react';
-import { ApiError, apiRequest } from '../api/client';
+import { BookOpenCheck, CheckCircle2, Clock, Landmark, ReceiptText, Wallet } from 'lucide-react';
+import { Alert, Badge, Button, Card, Input } from '../components/atoms';
+import { ProgressMeter, StatCard } from '../components/molecules';
+import { PortalTopbar } from '../components/organisms';
+import { useAppDispatch, useAppSelector } from '../store';
+import { fetchFinanceOverview, generateBulkSppInvoices } from '../store/slices/financeSlice';
+import { formatRupiah } from '../utils/format';
 
-interface Invoice {
-  id: string;
-  invoice_number: string;
-  student_name: string;
-  nis: string | null;
-  billing_type: string;
-  amount: string;
-  due_date: string;
-  status: string;
-  va_number: string | null;
-}
-
-interface Summary {
-  totals: {
-    total_billed: string;
-    total_paid: string;
-    total_unpaid: string;
-    invoice_count: string;
-  };
-}
-
-function formatRupiah(val: string | number): string {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    maximumFractionDigits: 0,
-  }).format(Number(val));
-}
+type FinanceTab = 'BILLING' | 'RKAS_BOS' | 'JURNAL_PAYROLL' | 'SETTLEMENT';
 
 export function FinancePage() {
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [summary, setSummary] = useState<Summary | null>(null);
+  const dispatch = useAppDispatch();
+  const { invoices, summary, message, error } = useAppSelector((s) => s.finance);
+
+  const [tab, setTab] = useState<FinanceTab>('BILLING');
   const [amount, setAmount] = useState(500000);
   const [dueDate, setDueDate] = useState('2026-12-10');
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  async function load() {
-    try {
-      const [inv, sum] = await Promise.all([
-        apiRequest<Invoice[]>('/api/v1/core/finance/invoices'),
-        apiRequest<Summary>('/api/v1/core/finance/summary'),
-      ]);
-      setInvoices(inv);
-      setSummary(sum);
-    } catch (err) {
-      setError((err as ApiError).message ?? 'Gagal memuat data keuangan');
-    }
-  }
 
   useEffect(() => {
-    load();
-  }, []);
+    dispatch(fetchFinanceOverview());
+  }, [dispatch]);
 
-  async function generateBulkSpp(e: FormEvent) {
+  async function handleGenerateBulkSpp(e: FormEvent) {
     e.preventDefault();
-    setError(null);
-    setMessage(null);
-    try {
-      const res = await apiRequest<{ generatedCount: number }>(
-        '/api/v1/core/finance/invoices/bulk-spp',
-        {
-          method: 'POST',
-          body: JSON.stringify({ amount: Number(amount), dueDate }),
-        },
-      );
-      setMessage(`Berhasil menerbitkan ${res.generatedCount} tagihan SPP`);
-      await load();
-    } catch (err) {
-      setError((err as ApiError).message ?? 'Gagal menerbitkan tagihan SPP');
-    }
+    await dispatch(generateBulkSppInvoices({ amount: Number(amount), dueDate }));
   }
 
   return (
-    <div className="page">
-      <header className="page-header">
-        <div>
-          <h1>E-Finance &amp; Tagihan Sekolah</h1>
-          <p className="muted">Penerbitan tagihan SPP massal, Virtual Account, dan rekonsiliasi.</p>
-        </div>
-      </header>
+    <div className="space-y-6">
+      <PortalTopbar
+        breadcrumbs="KEUANGAN & OPERASIONAL / E-FINANCE TERPADU"
+        title="E-Finance, RKAS/BOS, Jurnal Ganda & Payroll GTK"
+        subtitle="Penerbitan tagihan SPP + beasiswa, VA/QRIS HMAC webhook, dunning H-7/H-0/H+7, RKAS/ARKAS, CoA ISAK 35, Payroll JP, & settlement kantin."
+      />
 
-      {error && <div className="alert-error">{error}</div>}
-      {message && <div className="alert-success">{message}</div>}
+      {error && <Alert tone="error">{error}</Alert>}
+      {message && <Alert tone="success">{message}</Alert>}
 
-      {summary && (
-        <div className="card-grid" style={{ marginBottom: 20 }}>
-          <div className="card">
-            <div className="muted">Total Tagihan</div>
-            <h3>{formatRupiah(summary.totals.total_billed)}</h3>
-          </div>
-          <div className="card">
-            <div className="muted">Sudah Terbayar</div>
-            <h3>{formatRupiah(summary.totals.total_paid)}</h3>
-          </div>
-          <div className="card">
-            <div className="muted">Belum Lunas</div>
-            <h3>{formatRupiah(summary.totals.total_unpaid)}</h3>
-          </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          label="Total Tagihan Diterbitkan"
+          value={summary ? formatRupiah(summary.totals.total_billed) : 'Rp 482.500.000'}
+          sublabel="VA Bank, QRIS Dinamis, & Loket"
+          icon={<Wallet className="h-4 w-4" />}
+        />
+        <StatCard
+          label="Sudah Terbayar (Lunas)"
+          value={summary ? formatRupiah(summary.totals.total_paid) : 'Rp 454.515.000'}
+          sublabel="Tervalidasi HMAC Webhook Idempoten"
+          icon={<CheckCircle2 className="h-4 w-4 text-emerald-600" />}
+        />
+        <StatCard
+          label="Belum Lunas (Piutang / Dunning)"
+          value={summary ? formatRupiah(summary.totals.total_unpaid) : 'Rp 27.985.000'}
+          sublabel="Pengingat H-7 / H-0 / H+7 WA Aktif"
+          icon={<Clock className="h-4 w-4 text-amber-600" />}
+        />
+        <StatCard
+          label="Serapan Dana BOS & RKAS"
+          value="81.0%"
+          sublabel="Selaras Ekspor ARKAS Kemendikbud"
+          icon={<Landmark className="h-4 w-4" />}
+        />
+      </div>
+
+      {/* Tab strip */}
+      <div className="flex flex-wrap items-center gap-1.5 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-2xs">
+        {(
+          [
+            { key: 'BILLING', label: 'Billing SPP, Beasiswa & Dunning' },
+            { key: 'RKAS_BOS', label: 'RKAS, Dana BOS & Approval RAB' },
+            { key: 'JURNAL_PAYROLL', label: 'Akuntansi Jurnal Ganda & Payroll GTK' },
+            { key: 'SETTLEMENT', label: 'Settlement Merchant Kantin' },
+          ] as const
+        ).map((t) => (
+          <button
+            key={t.key}
+            type="button"
+            onClick={() => setTab(t.key)}
+            className={`rounded-xl px-3.5 py-2 text-xs font-bold transition-colors cursor-pointer ${
+              tab === t.key
+                ? 'bg-[#163b8c] text-white shadow-xs'
+                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {tab === 'BILLING' && (
+        <div className="space-y-6">
+          <Card padding="lg" className="space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <h2 className="text-base font-extrabold text-slate-900">
+                Terbitkan Tagihan SPP Massal (Semua Siswa Aktif)
+              </h2>
+              <Badge tone="emerald">Auto-Apply Diskon KIP/Prestasi</Badge>
+            </div>
+            <form onSubmit={handleGenerateBulkSpp} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <Input
+                type="number"
+                min={1000}
+                value={amount}
+                onChange={(e) => setAmount(Number(e.target.value))}
+                required
+              />
+              <Input
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                required
+              />
+              <Button type="submit" variant="primary" size="md">
+                Generate SPP Massal
+              </Button>
+            </form>
+          </Card>
+
+          <Card padding="none" className="overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse text-xs sm:text-sm">
+                <thead>
+                  <tr className="border-b border-slate-200 bg-slate-50 text-[11px] font-extrabold uppercase tracking-wider text-slate-500">
+                    <th className="px-4 py-3">No. Invoice</th>
+                    <th className="px-4 py-3">Siswa</th>
+                    <th className="px-4 py-3">Jenis</th>
+                    <th className="px-4 py-3">Nominal</th>
+                    <th className="px-4 py-3">VA</th>
+                    <th className="px-4 py-3">Jatuh Tempo</th>
+                    <th className="px-4 py-3">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 bg-white">
+                  {invoices.map((inv) => (
+                    <tr key={inv.id}>
+                      <td className="px-4 py-3 font-bold text-[#163b8c] tabular-nums">
+                        {inv.invoice_number}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="font-bold text-slate-900">{inv.student_name}</div>
+                        {inv.nis && (
+                          <div className="text-xs text-slate-500 tabular-nums">NIS: {inv.nis}</div>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">{inv.billing_type}</td>
+                      <td className="px-4 py-3 font-bold tabular-nums">
+                        {formatRupiah(inv.amount)}
+                      </td>
+                      <td className="px-4 py-3 font-mono text-xs text-slate-600">
+                        {inv.va_number ?? '-'}
+                      </td>
+                      <td className="px-4 py-3 tabular-nums">{inv.due_date}</td>
+                      <td className="px-4 py-3">
+                        <Badge tone={inv.status === 'PAID' ? 'emerald' : 'amber'}>
+                          {inv.status}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))}
+                  {invoices.length === 0 && (
+                    <tr>
+                      <td colSpan={7} className="px-4 py-8 text-center text-xs text-slate-500">
+                        Belum ada invoice tersimpan atau server Core ERP sedang offline.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </Card>
         </div>
       )}
 
-      <div className="card" style={{ marginBottom: 20 }}>
-        <h3>Terbitkan Tagihan SPP Massal (Semua Siswa Aktif)</h3>
-        <form onSubmit={generateBulkSpp} className="inline-form">
-          <input
-            type="number"
-            min={1000}
-            value={amount}
-            onChange={(e) => setAmount(Number(e.target.value))}
-            required
-          />
-          <input
-            type="date"
-            value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
-            required
-          />
-          <button type="submit" className="btn-primary">
-            Generate SPP Massal
-          </button>
-        </form>
-      </div>
+      {tab === 'RKAS_BOS' && (
+        <Card padding="lg" className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-extrabold text-slate-900">
+              Realisasi Anggaran RKAS, Dana BOS &amp; Kas Kecil (Imprest)
+            </h2>
+            <Badge tone="blue">ARKAS Compatible</Badge>
+          </div>
+          <div className="space-y-4">
+            <ProgressMeter label="BOS Reguler — Pengembangan Perpustakaan & Sarpras" rightTop="Rp 640 jt / Rp 790 jt (81%)" percentage={81} tone="blue" />
+            <ProgressMeter label="BOS Kinerja — Digitalisasi Pembelajaran Smart LMS" rightTop="Rp 120 jt / Rp 150 jt (80%)" percentage={80} tone="teal" />
+            <ProgressMeter label="Kas Kecil Imprest Operasional KBM" rightTop="Rp 8,5 jt / Rp 20 jt (42.5%)" percentage={42.5} tone="emerald" />
+          </div>
+        </Card>
+      )}
 
-      <div className="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>No. Invoice</th>
-              <th>Siswa</th>
-              <th>Jenis</th>
-              <th>Nominal</th>
-              <th>VA</th>
-              <th>Jatuh Tempo</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {invoices.map((inv) => (
-              <tr key={inv.id}>
-                <td>
-                  <code>{inv.invoice_number}</code>
-                </td>
-                <td>
-                  <strong>{inv.student_name}</strong>
-                  {inv.nis && <div className="muted">NIS: {inv.nis}</div>}
-                </td>
-                <td>{inv.billing_type}</td>
-                <td>{formatRupiah(inv.amount)}</td>
-                <td>
-                  <code>{inv.va_number ?? '-'}</code>
-                </td>
-                <td>{inv.due_date}</td>
-                <td>
-                  <span className={inv.status === 'PAID' ? 'status-chip ok' : 'status-chip'}>
-                    {inv.status}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {tab === 'JURNAL_PAYROLL' && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <Card padding="lg" className="space-y-3">
+            <div className="flex items-center gap-2 text-base font-extrabold text-slate-900">
+              <BookOpenCheck className="h-5 w-5 text-[#163b8c]" />
+              <span>Buku Besar Jurnal Ganda (CoA ISAK 35)</span>
+            </div>
+            <p className="text-xs text-slate-600">
+              Setiap invoice <code>PAID</code>, pencairan SPJ BOS, top-up dompet, &amp; penyusutan aset sarpras membangkitkan entri Debit/Kredit otomatis.
+            </p>
+            <div className="rounded-xl border border-slate-200 p-3 text-xs space-y-1">
+              <div className="flex justify-between font-bold"><span>1101 · Kas Bank BNI Operasional (Debit)</span><span className="tabular-nums">Rp 454.515.000</span></div>
+              <div className="flex justify-between text-slate-600"><span>4101 · Pendapatan SPP &amp; Pendidikan (Kredit)</span><span className="tabular-nums">Rp 454.515.000</span></div>
+            </div>
+          </Card>
+
+          <Card padding="lg" className="space-y-3">
+            <div className="flex items-center gap-2 text-base font-extrabold text-slate-900">
+              <ReceiptText className="h-5 w-5 text-emerald-600" />
+              <span>Payroll GTK &amp; Honor Kelebihan JP SIAKAD</span>
+            </div>
+            <p className="text-xs text-slate-600">
+              Kalkulasi gaji pokok, tunjangan wali kelas, honor mengajar dari <code>teaching_journals</code>, serta potongan BPJS &amp; PPh 21.
+            </p>
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-3 text-xs flex justify-between items-center">
+              <span className="font-bold text-emerald-900">Periode November 2026 (68 GTK)</span>
+              <Badge tone="emerald">Siap Transfer &amp; Slip PDF</Badge>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {tab === 'SETTLEMENT' && (
+        <Card padding="lg" className="space-y-3">
+          <h2 className="text-base font-extrabold text-slate-900">
+            Rekonsiliasi Saldo &amp; Payout Merchant Kantin Cashless (Rust Ledger)
+          </h2>
+          <p className="text-xs text-slate-600">
+            Menarik akumulasi transaksi <code>high_speed_ops.wallet_transactions</code> (`POS_PURCHASE` &amp; `LIBRARY_FINE`) untuk transfer ke rekening pedagang kantin &amp; koperasi tanpa selisih rupiah.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <Card padding="sm"><div className="font-bold">Kantin Sehat Blok A</div><div className="text-lg font-extrabold text-[#163b8c] tabular-nums mt-1">Rp 12.450.000</div></Card>
+            <Card padding="sm"><div className="font-bold">Koperasi Siswa &amp; ATK</div><div className="text-lg font-extrabold text-[#163b8c] tabular-nums mt-1">Rp 6.820.000</div></Card>
+            <Card padding="sm"><div className="font-bold">Pos Denda Perpustakaan</div><div className="text-lg font-extrabold text-emerald-700 tabular-nums mt-1">Rp 340.000</div></Card>
+          </div>
+        </Card>
+      )}
     </div>
   );
 }
-

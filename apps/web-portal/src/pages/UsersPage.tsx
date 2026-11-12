@@ -1,96 +1,65 @@
 import { FormEvent, useEffect, useState } from 'react';
-import { ApiError, apiRequest } from '../api/client';
-
-interface UserRow {
-  id: string;
-  username: string;
-  email: string | null;
-  is_active: boolean;
-  roles: string[];
-}
-
-interface RoleRow {
-  id: string;
-  code: string;
-  name: string;
-}
+import { Alert, Badge, Button, Card, Input, Select } from '../components/atoms';
+import { PortalTopbar } from '../components/organisms';
+import { useAppDispatch, useAppSelector } from '../store';
+import { createUserAccount, fetchUsersAndRoles } from '../store/slices/usersSlice';
 
 export function UsersPage() {
-  const [users, setUsers] = useState<UserRow[]>([]);
-  const [roles, setRoles] = useState<RoleRow[]>([]);
+  const dispatch = useAppDispatch();
+  const { users, roles, message, error } = useAppSelector((s) => s.users);
+
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [roleCode, setRoleCode] = useState('GURU');
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  async function load() {
-    try {
-      const [u, r] = await Promise.all([
-        apiRequest<UserRow[]>('/api/v1/core/users'),
-        apiRequest<RoleRow[]>('/api/v1/core/roles'),
-      ]);
-      setUsers(u);
-      setRoles(r);
-    } catch (err) {
-      setError((err as ApiError).message ?? 'Gagal memuat daftar pengguna');
-    }
-  }
 
   useEffect(() => {
-    load();
-  }, []);
+    dispatch(fetchUsersAndRoles());
+  }, [dispatch]);
 
   async function handleCreate(e: FormEvent) {
     e.preventDefault();
-    setError(null);
-    setMessage(null);
-    try {
-      await apiRequest('/api/v1/core/users', {
-        method: 'POST',
-        body: JSON.stringify({
-          username,
-          email: email || undefined,
-          password,
-          roleCodes: [roleCode],
-        }),
-      });
+    const res = await dispatch(
+      createUserAccount({
+        username,
+        email: email || undefined,
+        password,
+        roleCode,
+      }),
+    );
+    if (createUserAccount.fulfilled.match(res)) {
       setUsername('');
       setEmail('');
       setPassword('');
-      setMessage('Pengguna berhasil dibuat');
-      await load();
-    } catch (err) {
-      setError((err as ApiError).message ?? 'Gagal membuat pengguna');
     }
   }
 
   return (
-    <div className="page">
-      <header className="page-header">
-        <h1>Manajemen Pengguna &amp; RBAC SSO</h1>
-      </header>
+    <div className="space-y-6">
+      <PortalTopbar
+        title="Manajemen Pengguna & RBAC SSO"
+        subtitle="Kelola identitas warga sekolah terpusat dengan otorisasi peran JWT RS256."
+      />
 
-      {error && <div className="alert-error">{error}</div>}
-      {message && <div className="alert-success">{message}</div>}
+      {error && <Alert tone="error">{error}</Alert>}
+      {message && <Alert tone="success">{message}</Alert>}
 
-      <div className="card" style={{ marginBottom: 20 }}>
-        <h3>Tambah Akun Baru</h3>
-        <form onSubmit={handleCreate} className="inline-form">
-          <input
+      <Card padding="lg" className="space-y-4">
+        <h2 className="text-base font-extrabold text-slate-900">Tambah Akun Baru</h2>
+        <form onSubmit={handleCreate} className="grid grid-cols-1 sm:grid-cols-5 gap-3">
+          <Input
             placeholder="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
           />
-          <input
+          <Input
             type="email"
             placeholder="Email (opsional)"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-          <input
+          <Input
             type="password"
             placeholder="Password (min 8)"
             value={password}
@@ -98,44 +67,55 @@ export function UsersPage() {
             minLength={8}
             required
           />
-          <select value={roleCode} onChange={(e) => setRoleCode(e.target.value)}>
+          <Select value={roleCode} onChange={(e) => setRoleCode(e.target.value)}>
             {roles.map((r) => (
               <option key={r.id} value={r.code}>
                 {r.name} ({r.code})
               </option>
             ))}
-          </select>
-          <button type="submit" className="btn-primary">
+          </Select>
+          <Button type="submit" variant="primary" size="md">
             Tambah User
-          </button>
+          </Button>
         </form>
-      </div>
+      </Card>
 
-      <div className="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Username</th>
-              <th>Email</th>
-              <th>Peran (RBAC)</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((u) => (
-              <tr key={u.id}>
-                <td>
-                  <strong>{u.username}</strong>
-                </td>
-                <td>{u.email ?? '-'}</td>
-                <td>{u.roles.join(', ')}</td>
-                <td>{u.is_active ? 'Aktif' : 'Nonaktif'}</td>
+      <Card padding="none" className="overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse text-xs sm:text-sm">
+            <thead>
+              <tr className="border-b border-slate-200 bg-slate-50 text-[11px] font-extrabold uppercase tracking-wider text-slate-500">
+                <th className="px-4 py-3">Username</th>
+                <th className="px-4 py-3">Email</th>
+                <th className="px-4 py-3">Peran (RBAC)</th>
+                <th className="px-4 py-3">Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="divide-y divide-slate-100 bg-white">
+              {users.map((u) => (
+                <tr key={u.id}>
+                  <td className="px-4 py-3 font-bold text-slate-900">{u.username}</td>
+                  <td className="px-4 py-3 text-slate-600">{u.email ?? '-'}</td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-1 flex-wrap">
+                      {u.roles.map((role) => (
+                        <Badge key={role} tone="blue">
+                          {role}
+                        </Badge>
+                      ))}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <Badge tone={u.is_active ? 'emerald' : 'slate'}>
+                      {u.is_active ? 'Aktif' : 'Nonaktif'}
+                    </Badge>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
     </div>
   );
 }
-

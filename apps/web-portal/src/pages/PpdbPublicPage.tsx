@@ -1,179 +1,72 @@
-import { FormEvent, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ApiError, apiRequest } from '../api/client';
-
-interface PpdbRegisterResponse {
-  applicationId: string;
-  registrationNumber: string;
-  verificationStatus: string;
-  invoiceId: string | null;
-}
+import { HelpCircle, MessageSquare } from 'lucide-react';
+import { Button, Card } from '../components/atoms';
+import {
+  PpdbWizardSidebar,
+  PpdbWizardStepContent,
+  PpdbWizardStepper,
+} from '../components/organisms';
+import { WizardSplitTemplate } from '../components/templates';
+import { useAppDispatch, useAppSelector } from '../store';
+import { setWizardStep, submitPpdbRegistration } from '../store/slices/ppdbPublicSlice';
 
 export function PpdbPublicPage() {
-  const [fullName, setFullName] = useState('');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [email, setEmail] = useState('');
-  const [nisn, setNisn] = useState('');
-  const [gender, setGender] = useState<'MALE' | 'FEMALE'>('MALE');
-  const [admissionTrack, setAdmissionTrack] = useState('REGULER');
-  const [previousSchool, setPreviousSchool] = useState('');
-  const [parentName, setParentName] = useState('');
-  const [parentPhone, setParentPhone] = useState('');
-  const [result, setResult] = useState<PpdbRegisterResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
+  const dispatch = useAppDispatch();
+  const draft = useAppSelector((s) => s.ppdbPublic.draft);
 
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    setError(null);
-    setSubmitting(true);
-    try {
-      const res = await apiRequest<PpdbRegisterResponse>(
-        '/api/v1/core/ppdb/register',
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            fullName,
-            username,
-            password,
-            email: email || undefined,
-            nisn: nisn || undefined,
-            gender,
-            admissionTrack,
-            previousSchool: previousSchool || undefined,
-            parentName,
-            parentPhone,
-            ppdbFeeAmount: 150000,
-          }),
-        },
-        false,
-      );
-      setResult(res);
-    } catch (err) {
-      setError((err as ApiError).message ?? 'Gagal mendaftar PPDB');
-    } finally {
-      setSubmitting(false);
+  async function handleFinalSubmit() {
+    if (!draft.username.trim() || draft.password.length < 8) {
+      dispatch(setWizardStep(1));
+      return;
     }
+    if (!draft.parentName.trim() || !draft.parentPhone.trim()) {
+      dispatch(setWizardStep(4));
+      return;
+    }
+    await dispatch(submitPpdbRegistration(draft));
   }
 
   return (
-    <div className="public-page">
-      <div className="public-card">
-        <div className="top-bar">
-          <div>
-            <div className="badge-pill">Portal Penerimaan Siswa Baru</div>
-            <h1>Formulir E-PPDB Online</h1>
-          </div>
-          <Link to="/login" className="btn-secondary">
-            Login SSO →
-          </Link>
-        </div>
-
-        {error && <div className="alert-error">{error}</div>}
-
-        {result ? (
-          <div className="alert-success">
-            <h3>Pendaftaran Berhasil!</h3>
-            <p>
-              Nomor Pendaftaran Anda: <strong>{result.registrationNumber}</strong>
-            </p>
-            <p>
-              Status: <strong>{result.verificationStatus}</strong>
-            </p>
-            <p>
-              Silakan <Link to="/login">Login SSO</Link> menggunakan username{' '}
-              <code>{username}</code> untuk mengunggah berkas persyaratan.
-            </p>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="form-grid">
-            <label>
-              <span>Nama Lengkap Calon Siswa *</span>
-              <input value={fullName} onChange={(e) => setFullName(e.target.value)} required />
-            </label>
-            <label>
-              <span>Username Akun Siswa *</span>
-              <input
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                minLength={4}
-                required
-              />
-            </label>
-            <label>
-              <span>Kata Sandi Akun *</span>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                minLength={8}
-                required
-              />
-            </label>
-            <label>
-              <span>Email (Opsional)</span>
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-            </label>
-            <label>
-              <span>NISN (Opsional)</span>
-              <input value={nisn} onChange={(e) => setNisn(e.target.value)} />
-            </label>
-            <label>
-              <span>Jenis Kelamin *</span>
-              <select
-                value={gender}
-                onChange={(e) => setGender(e.target.value as 'MALE' | 'FEMALE')}
-              >
-                <option value="MALE">Laki-laki</option>
-                <option value="FEMALE">Perempuan</option>
-              </select>
-            </label>
-            <label>
-              <span>Jalur Pendaftaran *</span>
-              <select
-                value={admissionTrack}
-                onChange={(e) => setAdmissionTrack(e.target.value)}
-              >
-                <option value="REGULER">Reguler</option>
-                <option value="ZONASI">Zonasi</option>
-                <option value="PRESTASI">Prestasi</option>
-                <option value="AFIRMASI">Afirmasi</option>
-                <option value="MUTASI">Mutasi</option>
-              </select>
-            </label>
-            <label>
-              <span>Asal Sekolah</span>
-              <input
-                value={previousSchool}
-                onChange={(e) => setPreviousSchool(e.target.value)}
-              />
-            </label>
-            <label>
-              <span>Nama Orang Tua / Wali *</span>
-              <input
-                value={parentName}
-                onChange={(e) => setParentName(e.target.value)}
-                required
-              />
-            </label>
-            <label>
-              <span>No. HP / WhatsApp Orang Tua *</span>
-              <input
-                value={parentPhone}
-                onChange={(e) => setParentPhone(e.target.value)}
-                required
-              />
-            </label>
-            <div className="full-span">
-              <button type="submit" className="btn-primary" disabled={submitting}>
-                {submitting ? 'Mengirim Pendaftaran...' : 'Kirim Pendaftaran E-PPDB'}
-              </button>
+    <WizardSplitTemplate
+      header={<PpdbWizardStepper />}
+      main={<PpdbWizardStepContent onFinalSubmit={handleFinalSubmit} />}
+      sidebar={<PpdbWizardSidebar onFinalSubmit={handleFinalSubmit} />}
+      footerBanner={
+        <Card padding="md" className="bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-900 text-white">
+              <MessageSquare className="h-5 w-5" />
             </div>
-          </form>
-        )}
-      </div>
-    </div>
+            <div>
+              <h3 className="text-sm font-extrabold text-slate-900">
+                Butuh Bantuan Pengukuran Jarak Rumah atau Berkas?
+              </h3>
+              <p className="text-xs text-slate-600">
+                Operator Verifikator PPDB siap melayani pertanyaan via live chat resmi.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+            <a
+              href="https://wa.me/6281123456789"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 px-4 py-2 text-xs font-bold text-white transition-colors"
+            >
+              <MessageSquare className="h-3.5 w-3.5" />
+              <span>WhatsApp Verifikator PPDB</span>
+            </a>
+            <Button
+              variant="outline"
+              size="sm"
+              leftIcon={<HelpCircle className="h-3.5 w-3.5" />}
+              onClick={() => dispatch(setWizardStep(2))}
+            >
+              FAQ Zonasi
+            </Button>
+          </div>
+        </Card>
+      }
+    />
   );
 }
-

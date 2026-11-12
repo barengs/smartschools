@@ -1,259 +1,204 @@
 import { FormEvent, useEffect, useState } from 'react';
-import { ApiError, apiRequest } from '../api/client';
-
-interface Period {
-  id: string;
-  name: string;
-  semester: string;
-  start_date: string;
-  end_date: string;
-  is_active: boolean;
-}
-
-interface Classroom {
-  id: string;
-  name: string;
-  grade_level: number;
-  room_code: string | null;
-  student_count: string;
-}
-
-interface Student {
-  id: string;
-  nis: string | null;
-  nisn: string | null;
-  full_name: string;
-  status: string;
-}
+import { Download } from 'lucide-react';
+import { Alert, Badge, Button, Card, Input, Select } from '../components/atoms';
+import { PortalTopbar } from '../components/organisms';
+import { useAppDispatch, useAppSelector } from '../store';
+import {
+  activateAcademicPeriod,
+  checkDapodikExport,
+  createAcademicPeriod,
+  createClassroom,
+  fetchSiakadOverview,
+  setSelectedPeriodId,
+} from '../store/slices/siakadSlice';
 
 export function SiakadPage() {
-  const [periods, setPeriods] = useState<Period[]>([]);
-  const [classrooms, setClassrooms] = useState<Classroom[]>([]);
-  const [students, setStudents] = useState<Student[]>([]);
+  const dispatch = useAppDispatch();
+  const { periods, classrooms, students, selectedPeriodId, message, error } = useAppSelector(
+    (s) => s.siakad,
+  );
+
   const [periodName, setPeriodName] = useState('');
   const [semester, setSemester] = useState<'ODD' | 'EVEN'>('ODD');
   const [startDate, setStartDate] = useState('2026-07-13');
   const [endDate, setEndDate] = useState('2026-12-18');
   const [roomName, setRoomName] = useState('');
   const [gradeLevel, setGradeLevel] = useState(10);
-  const [selectedPeriodId, setSelectedPeriodId] = useState('');
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  async function loadAll() {
-    try {
-      const [p, c, s] = await Promise.all([
-        apiRequest<Period[]>('/api/v1/core/siakad/periods'),
-        apiRequest<Classroom[]>('/api/v1/core/siakad/classrooms'),
-        apiRequest<Student[]>('/api/v1/core/siakad/students'),
-      ]);
-      setPeriods(p);
-      setClassrooms(c);
-      setStudents(s);
-      if (p.length > 0 && !selectedPeriodId) {
-        const active = p.find((item) => item.is_active) ?? p[0];
-        setSelectedPeriodId(active.id);
-      }
-    } catch (err) {
-      setError((err as ApiError).message ?? 'Gagal memuat data SIAKAD');
-    }
-  }
 
   useEffect(() => {
-    loadAll();
-  }, []);
+    dispatch(fetchSiakadOverview());
+  }, [dispatch]);
 
-  async function createPeriod(e: FormEvent) {
+  async function handleCreatePeriod(e: FormEvent) {
     e.preventDefault();
-    setError(null);
-    try {
-      await apiRequest('/api/v1/core/siakad/periods', {
-        method: 'POST',
-        body: JSON.stringify({
-          name: periodName,
-          semester,
-          startDate,
-          endDate,
-          isActive: periods.length === 0,
-        }),
-      });
+    const res = await dispatch(
+      createAcademicPeriod({
+        name: periodName,
+        semester,
+        startDate,
+        endDate,
+        isActive: periods.length === 0,
+      }),
+    );
+    if (createAcademicPeriod.fulfilled.match(res)) {
       setPeriodName('');
-      setMessage('Tahun ajaran ditambahkan');
-      await loadAll();
-    } catch (err) {
-      setError((err as ApiError).message ?? 'Gagal membuat tahun ajaran');
     }
   }
 
-  async function activatePeriod(id: string) {
-    await apiRequest(`/api/v1/core/siakad/periods/${id}/activate`, { method: 'PATCH' });
-    setSelectedPeriodId(id);
-    await loadAll();
-  }
-
-  async function createClassroom(e: FormEvent) {
+  async function handleCreateClassroom(e: FormEvent) {
     e.preventDefault();
-    if (!selectedPeriodId) {
-      setError('Buat atau pilih Tahun Ajaran terlebih dahulu');
-      return;
-    }
-    setError(null);
-    try {
-      await apiRequest('/api/v1/core/siakad/classrooms', {
-        method: 'POST',
-        body: JSON.stringify({
-          academicPeriodId: selectedPeriodId,
-          name: roomName,
-          gradeLevel: Number(gradeLevel),
-        }),
-      });
+    if (!selectedPeriodId) return;
+    const res = await dispatch(
+      createClassroom({
+        academicPeriodId: selectedPeriodId,
+        name: roomName,
+        gradeLevel: Number(gradeLevel),
+      }),
+    );
+    if (createClassroom.fulfilled.match(res)) {
       setRoomName('');
-      setMessage('Rombel ditambahkan');
-      await loadAll();
-    } catch (err) {
-      setError((err as ApiError).message ?? 'Gagal menambah rombel');
-    }
-  }
-
-  async function exportDapodik() {
-    try {
-      const data = await apiRequest<{ totalActiveStudents: number }>(
-        '/api/v1/core/siakad/students/export/dapodik',
-      );
-      setMessage(`Siap ekspor Dapodik/EMIS untuk ${data.totalActiveStudents} siswa aktif`);
-    } catch (err) {
-      setError((err as ApiError).message ?? 'Gagal mengekspor Dapodik');
     }
   }
 
   return (
-    <div className="page">
-      <header className="page-header">
-        <div>
-          <h1>SIAKAD &amp; Buku Induk Digital</h1>
-          <p className="muted">Kelola tahun ajaran, rombel, dan data induk siswa siap Dapodik.</p>
-        </div>
-        <button type="button" className="btn-secondary" onClick={exportDapodik}>
-          Cek Ekspor Dapodik/EMIS
-        </button>
-      </header>
+    <div className="space-y-6">
+      <PortalTopbar
+        title="SIAKAD & Buku Induk Digital"
+        subtitle="Kelola tahun ajaran, rombel, dan data induk siswa siap Dapodik/EMIS."
+        rightSlot={
+          <Button
+            variant="outline"
+            size="sm"
+            leftIcon={<Download className="h-3.5 w-3.5" />}
+            onClick={() => dispatch(checkDapodikExport())}
+          >
+            Cek Ekspor Dapodik/EMIS
+          </Button>
+        }
+      />
 
-      {error && <div className="alert-error">{error}</div>}
-      {message && <div className="alert-success">{message}</div>}
+      {error && <Alert tone="error">{error}</Alert>}
+      {message && <Alert tone="success">{message}</Alert>}
 
-      <div className="card" style={{ marginBottom: 18 }}>
-        <h3>Tahun Ajaran</h3>
-        <form onSubmit={createPeriod} className="inline-form" style={{ marginBottom: 12 }}>
-          <input
+      <Card padding="lg" className="space-y-4">
+        <h2 className="text-base font-extrabold text-slate-900">Tahun Ajaran</h2>
+        <form onSubmit={handleCreatePeriod} className="grid grid-cols-1 sm:grid-cols-5 gap-3">
+          <Input
             placeholder="Misal: 2026/2027"
             value={periodName}
             onChange={(e) => setPeriodName(e.target.value)}
             required
           />
-          <select value={semester} onChange={(e) => setSemester(e.target.value as 'ODD' | 'EVEN')}>
+          <Select
+            value={semester}
+            onChange={(e) => setSemester(e.target.value as 'ODD' | 'EVEN')}
+          >
             <option value="ODD">Ganjil</option>
             <option value="EVEN">Genap</option>
-          </select>
-          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-          <button type="submit" className="btn-primary">
+          </Select>
+          <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+          <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+          <Button type="submit" variant="primary" size="md">
             Tambah Periode
-          </button>
+          </Button>
         </form>
-        <div className="actions-cell">
+
+        <div className="flex items-center gap-2 flex-wrap pt-1">
           {periods.map((p) => (
-            <button
+            <Button
               key={p.id}
-              type="button"
-              className={p.is_active ? 'btn-sm ok' : 'btn-sm'}
-              onClick={() => activatePeriod(p.id)}
+              size="sm"
+              variant={p.is_active ? 'emerald' : 'outline'}
+              onClick={() => dispatch(activateAcademicPeriod(p.id))}
             >
               {p.name} ({p.semester}) {p.is_active ? '✓ Aktif' : 'Aktifkan'}
-            </button>
+            </Button>
           ))}
         </div>
-      </div>
+      </Card>
 
-      <div className="card" style={{ marginBottom: 18 }}>
-        <h3>Rombongan Belajar (Rombel)</h3>
-        <form onSubmit={createClassroom} className="inline-form" style={{ marginBottom: 12 }}>
-          <select value={selectedPeriodId} onChange={(e) => setSelectedPeriodId(e.target.value)}>
+      <Card padding="lg" className="space-y-4">
+        <h2 className="text-base font-extrabold text-slate-900">Rombongan Belajar (Rombel)</h2>
+        <form onSubmit={handleCreateClassroom} className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+          <Select
+            value={selectedPeriodId}
+            onChange={(e) => dispatch(setSelectedPeriodId(e.target.value))}
+          >
             {periods.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.name} ({p.semester})
               </option>
             ))}
-          </select>
-          <input
+          </Select>
+          <Input
             placeholder="Nama Kelas (mis. X-IPA-1)"
             value={roomName}
             onChange={(e) => setRoomName(e.target.value)}
             required
           />
-          <input
+          <Input
             type="number"
             min={1}
             max={12}
             value={gradeLevel}
             onChange={(e) => setGradeLevel(Number(e.target.value))}
           />
-          <button type="submit" className="btn-primary">
+          <Button type="submit" variant="primary" size="md">
             Tambah Rombel
-          </button>
+          </Button>
         </form>
-        <div className="table-wrap">
-          <table>
+
+        <div className="overflow-x-auto rounded-xl border border-slate-200">
+          <table className="w-full text-left border-collapse text-xs sm:text-sm">
             <thead>
-              <tr>
-                <th>Kelas</th>
-                <th>Tingkat</th>
-                <th>Jumlah Siswa</th>
+              <tr className="border-b border-slate-200 bg-slate-50 text-[11px] font-extrabold uppercase tracking-wider text-slate-500">
+                <th className="px-4 py-2.5">Kelas</th>
+                <th className="px-4 py-2.5">Tingkat</th>
+                <th className="px-4 py-2.5">Jumlah Siswa</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-slate-100 bg-white">
               {classrooms.map((c) => (
                 <tr key={c.id}>
-                  <td>
-                    <strong>{c.name}</strong>
-                  </td>
-                  <td>Kelas {c.grade_level}</td>
-                  <td>{c.student_count}</td>
+                  <td className="px-4 py-2.5 font-bold text-slate-900">{c.name}</td>
+                  <td className="px-4 py-2.5 text-slate-600">Kelas {c.grade_level}</td>
+                  <td className="px-4 py-2.5 font-semibold tabular-nums">{c.student_count}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-      </div>
+      </Card>
 
-      <div className="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>NIS</th>
-              <th>NISN</th>
-              <th>Nama Siswa</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {students.map((s) => (
-              <tr key={s.id}>
-                <td>{s.nis ?? '-'}</td>
-                <td>{s.nisn ?? '-'}</td>
-                <td>
-                  <strong>{s.full_name}</strong>
-                </td>
-                <td>
-                  <span className={s.status === 'ACTIVE' ? 'status-chip ok' : 'status-chip'}>
-                    {s.status}
-                  </span>
-                </td>
+      <Card padding="none" className="overflow-hidden">
+        <div className="border-b border-slate-200 bg-slate-50 px-4 py-3 text-xs font-extrabold uppercase tracking-wider text-slate-600">
+          Daftar Siswa Buku Induk ({students.length})
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse text-xs sm:text-sm">
+            <thead>
+              <tr className="border-b border-slate-200 bg-slate-50 text-[11px] font-extrabold uppercase tracking-wider text-slate-500">
+                <th className="px-4 py-3">NIS</th>
+                <th className="px-4 py-3">NISN</th>
+                <th className="px-4 py-3">Nama Siswa</th>
+                <th className="px-4 py-3">Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="divide-y divide-slate-100 bg-white">
+              {students.map((s) => (
+                <tr key={s.id}>
+                  <td className="px-4 py-3 tabular-nums">{s.nis ?? '-'}</td>
+                  <td className="px-4 py-3 tabular-nums">{s.nisn ?? '-'}</td>
+                  <td className="px-4 py-3 font-bold text-slate-900">{s.full_name}</td>
+                  <td className="px-4 py-3">
+                    <Badge tone={s.status === 'ACTIVE' ? 'emerald' : 'slate'}>{s.status}</Badge>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
     </div>
   );
 }
-
