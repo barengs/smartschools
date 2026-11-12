@@ -1,15 +1,20 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { ColumnDef } from '@tanstack/react-table';
 import { Download } from 'lucide-react';
-import { Alert, Badge, Button, Card, Input, Select } from '../components/atoms';
+import { toast } from 'react-toastify';
+import { Badge, Button, Card, Input, Select } from '../components/atoms';
+import { DataTable } from '../components/molecules';
 import { PortalTopbar } from '../components/organisms';
 import { useAppDispatch, useAppSelector } from '../store';
 import {
   activateAcademicPeriod,
   checkDapodikExport,
+  Classroom,
   createAcademicPeriod,
   createClassroom,
   fetchSiakadOverview,
   setSelectedPeriodId,
+  Student,
 } from '../store/slices/siakadSlice';
 
 export function SiakadPage() {
@@ -28,6 +33,69 @@ export function SiakadPage() {
   useEffect(() => {
     dispatch(fetchSiakadOverview());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (message) toast.success(message);
+  }, [message]);
+
+  useEffect(() => {
+    if (error) toast.error(error);
+  }, [error]);
+
+  const classroomColumns = useMemo<ColumnDef<Classroom, unknown>[]>(
+    () => [
+      {
+        accessorKey: 'name',
+        header: 'Kelas',
+        cell: ({ row }) => <span className="font-bold text-[#212529]">{row.original.name}</span>,
+      },
+      {
+        accessorKey: 'grade_level',
+        header: 'Tingkat',
+        cell: ({ row }) => <span className="text-[#495057]">Kelas {row.original.grade_level}</span>,
+      },
+      {
+        accessorKey: 'student_count',
+        header: 'Jumlah Siswa',
+        cell: ({ row }) => (
+          <span className="font-semibold tabular-nums">{row.original.student_count}</span>
+        ),
+      },
+    ],
+    [],
+  );
+
+  const studentColumns = useMemo<ColumnDef<Student, unknown>[]>(
+    () => [
+      {
+        accessorKey: 'nis',
+        header: 'NIS',
+        cell: ({ row }) => <span className="tabular-nums">{row.original.nis ?? '-'}</span>,
+      },
+      {
+        accessorKey: 'nisn',
+        header: 'NISN',
+        cell: ({ row }) => <span className="tabular-nums">{row.original.nisn ?? '-'}</span>,
+      },
+      {
+        accessorKey: 'full_name',
+        header: 'Nama Siswa',
+        cell: ({ row }) => (
+          <span className="font-bold text-[#212529]">{row.original.full_name}</span>
+        ),
+      },
+      {
+        accessorKey: 'status',
+        header: 'Status',
+        cell: ({ row }) => (
+          <Badge tone={row.original.status === 'ACTIVE' ? 'emerald' : 'slate'}>
+            {row.original.status}
+          </Badge>
+        ),
+      },
+    ],
+    [],
+  );
 
   async function handleCreatePeriod(e: FormEvent) {
     e.preventDefault();
@@ -76,9 +144,6 @@ export function SiakadPage() {
           </Button>
         }
       />
-
-      {error && <Alert tone="error">{error}</Alert>}
-      {message && <Alert tone="success">{message}</Alert>}
 
       <Card padding="lg" className="space-y-4">
         <h2 className="text-base font-extrabold text-slate-900">Tahun Ajaran</h2>
@@ -148,56 +213,25 @@ export function SiakadPage() {
           </Button>
         </form>
 
-        <div className="overflow-x-auto rounded border border-slate-200">
-          <table className="w-full text-left border-collapse text-xs sm:text-sm">
-            <thead>
-              <tr className="border-b border-slate-200 bg-slate-50 text-[11px] font-extrabold uppercase tracking-wider text-slate-500">
-                <th className="px-4 py-2.5">Kelas</th>
-                <th className="px-4 py-2.5">Tingkat</th>
-                <th className="px-4 py-2.5">Jumlah Siswa</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 bg-white">
-              {classrooms.map((c) => (
-                <tr key={c.id}>
-                  <td className="px-4 py-2.5 font-bold text-slate-900">{c.name}</td>
-                  <td className="px-4 py-2.5 text-slate-600">Kelas {c.grade_level}</td>
-                  <td className="px-4 py-2.5 font-semibold tabular-nums">{c.student_count}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="overflow-hidden rounded border border-[#dee2e6]">
+          <DataTable
+            data={classrooms}
+            columns={classroomColumns}
+            compact
+            emptyMessage="Belum ada data rombel."
+          />
         </div>
       </Card>
 
       <Card padding="none" className="overflow-hidden">
-        <div className="border-b border-slate-200 bg-slate-50 px-4 py-3 text-xs font-extrabold uppercase tracking-wider text-slate-600">
+        <div className="border-b border-[#dee2e6] bg-[#f8f9fa] px-4 py-3 text-xs font-bold uppercase tracking-wider text-[#495057]">
           Daftar Siswa Buku Induk ({students.length})
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs sm:text-sm">
-            <thead>
-              <tr className="border-b border-slate-200 bg-slate-50 text-[11px] font-extrabold uppercase tracking-wider text-slate-500">
-                <th className="px-4 py-3">NIS</th>
-                <th className="px-4 py-3">NISN</th>
-                <th className="px-4 py-3">Nama Siswa</th>
-                <th className="px-4 py-3">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 bg-white">
-              {students.map((s) => (
-                <tr key={s.id}>
-                  <td className="px-4 py-3 tabular-nums">{s.nis ?? '-'}</td>
-                  <td className="px-4 py-3 tabular-nums">{s.nisn ?? '-'}</td>
-                  <td className="px-4 py-3 font-bold text-slate-900">{s.full_name}</td>
-                  <td className="px-4 py-3">
-                    <Badge tone={s.status === 'ACTIVE' ? 'emerald' : 'slate'}>{s.status}</Badge>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          data={students}
+          columns={studentColumns}
+          emptyMessage="Belum ada data siswa."
+        />
       </Card>
     </div>
   );

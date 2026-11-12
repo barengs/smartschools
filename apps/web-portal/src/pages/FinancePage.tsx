@@ -1,10 +1,12 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { ColumnDef } from '@tanstack/react-table';
 import { BookOpenCheck, CheckCircle2, Clock, Landmark, ReceiptText, Wallet } from 'lucide-react';
-import { Alert, Badge, Button, Card, Input } from '../components/atoms';
-import { ProgressMeter, StatCard } from '../components/molecules';
+import { toast } from 'react-toastify';
+import { Badge, Button, Card, Input } from '../components/atoms';
+import { DataTable, ProgressMeter, StatCard } from '../components/molecules';
 import { PortalTopbar } from '../components/organisms';
 import { useAppDispatch, useAppSelector } from '../store';
-import { fetchFinanceOverview, generateBulkSppInvoices } from '../store/slices/financeSlice';
+import { fetchFinanceOverview, generateBulkSppInvoices, Invoice } from '../store/slices/financeSlice';
 import { formatRupiah } from '../utils/format';
 
 type FinanceTab = 'BILLING' | 'RKAS_BOS' | 'JURNAL_PAYROLL' | 'SETTLEMENT';
@@ -21,6 +23,73 @@ export function FinancePage() {
     dispatch(fetchFinanceOverview());
   }, [dispatch]);
 
+  useEffect(() => {
+    if (message) toast.success(message);
+  }, [message]);
+
+  useEffect(() => {
+    if (error) toast.error(error);
+  }, [error]);
+
+  const invoiceColumns = useMemo<ColumnDef<Invoice, unknown>[]>(
+    () => [
+      {
+        accessorKey: 'invoice_number',
+        header: 'No. Invoice',
+        cell: ({ row }) => (
+          <span className="font-bold text-[#0d6efd] tabular-nums">
+            {row.original.invoice_number}
+          </span>
+        ),
+      },
+      {
+        accessorKey: 'student_name',
+        header: 'Siswa',
+        cell: ({ row }) => (
+          <div>
+            <div className="font-bold text-[#212529]">{row.original.student_name}</div>
+            {row.original.nis && (
+              <div className="text-xs text-[#6c757d] tabular-nums">NIS: {row.original.nis}</div>
+            )}
+          </div>
+        ),
+      },
+      {
+        accessorKey: 'billing_type',
+        header: 'Jenis',
+      },
+      {
+        accessorKey: 'amount',
+        header: 'Nominal',
+        cell: ({ row }) => (
+          <span className="font-bold tabular-nums">{formatRupiah(row.original.amount)}</span>
+        ),
+      },
+      {
+        accessorKey: 'va_number',
+        header: 'VA',
+        cell: ({ row }) => (
+          <span className="font-mono text-xs text-[#495057]">{row.original.va_number ?? '-'}</span>
+        ),
+      },
+      {
+        accessorKey: 'due_date',
+        header: 'Jatuh Tempo',
+        cell: ({ row }) => <span className="tabular-nums">{row.original.due_date}</span>,
+      },
+      {
+        accessorKey: 'status',
+        header: 'Status',
+        cell: ({ row }) => (
+          <Badge tone={row.original.status === 'PAID' ? 'emerald' : 'amber'}>
+            {row.original.status}
+          </Badge>
+        ),
+      },
+    ],
+    [],
+  );
+
   async function handleGenerateBulkSpp(e: FormEvent) {
     e.preventDefault();
     await dispatch(generateBulkSppInvoices({ amount: Number(amount), dueDate }));
@@ -33,9 +102,6 @@ export function FinancePage() {
         title="E-Finance, RKAS/BOS, Jurnal Ganda & Payroll GTK"
         subtitle="Penerbitan tagihan SPP + beasiswa, VA/QRIS HMAC webhook, dunning H-7/H-0/H+7, RKAS/ARKAS, CoA ISAK 35, Payroll JP, & settlement kantin."
       />
-
-      {error && <Alert tone="error">{error}</Alert>}
-      {message && <Alert tone="success">{message}</Alert>}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
@@ -119,56 +185,11 @@ export function FinancePage() {
           </Card>
 
           <Card padding="none" className="overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-xs sm:text-sm">
-                <thead>
-                  <tr className="border-b border-slate-200 bg-slate-50 text-[11px] font-extrabold uppercase tracking-wider text-slate-500">
-                    <th className="px-4 py-3">No. Invoice</th>
-                    <th className="px-4 py-3">Siswa</th>
-                    <th className="px-4 py-3">Jenis</th>
-                    <th className="px-4 py-3">Nominal</th>
-                    <th className="px-4 py-3">VA</th>
-                    <th className="px-4 py-3">Jatuh Tempo</th>
-                    <th className="px-4 py-3">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 bg-white">
-                  {invoices.map((inv) => (
-                    <tr key={inv.id}>
-                      <td className="px-4 py-3 font-bold text-[#163b8c] tabular-nums">
-                        {inv.invoice_number}
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="font-bold text-slate-900">{inv.student_name}</div>
-                        {inv.nis && (
-                          <div className="text-xs text-slate-500 tabular-nums">NIS: {inv.nis}</div>
-                        )}
-                      </td>
-                      <td className="px-4 py-3">{inv.billing_type}</td>
-                      <td className="px-4 py-3 font-bold tabular-nums">
-                        {formatRupiah(inv.amount)}
-                      </td>
-                      <td className="px-4 py-3 font-mono text-xs text-slate-600">
-                        {inv.va_number ?? '-'}
-                      </td>
-                      <td className="px-4 py-3 tabular-nums">{inv.due_date}</td>
-                      <td className="px-4 py-3">
-                        <Badge tone={inv.status === 'PAID' ? 'emerald' : 'amber'}>
-                          {inv.status}
-                        </Badge>
-                      </td>
-                    </tr>
-                  ))}
-                  {invoices.length === 0 && (
-                    <tr>
-                      <td colSpan={7} className="px-4 py-8 text-center text-xs text-slate-500">
-                        Belum ada invoice tersimpan atau server Core ERP sedang offline.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+            <DataTable
+              data={invoices}
+              columns={invoiceColumns}
+              emptyMessage="Belum ada invoice tersimpan atau server Core ERP sedang offline."
+            />
           </Card>
         </div>
       )}

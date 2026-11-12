@@ -1,4 +1,5 @@
 import { HelpCircle, MessageSquare } from 'lucide-react';
+import { toast } from 'react-toastify';
 import { Button, Card } from '../components/atoms';
 import {
   PpdbWizardSidebar,
@@ -15,14 +16,21 @@ export function PpdbPublicPage() {
 
   async function handleFinalSubmit() {
     if (!draft.username.trim() || draft.password.length < 8) {
+      toast.error('Lengkapi Username dan Kata Sandi (minimal 8 karakter) pada Langkah 1.');
       dispatch(setWizardStep(1));
       return;
     }
     if (!draft.parentName.trim() || !draft.parentPhone.trim()) {
+      toast.error('Lengkapi Nama Orang Tua dan Nomor WhatsApp pada Langkah 4.');
       dispatch(setWizardStep(4));
       return;
     }
-    await dispatch(submitPpdbRegistration(draft));
+    const res = await dispatch(submitPpdbRegistration(draft));
+    if (submitPpdbRegistration.fulfilled.match(res)) {
+      toast.success(`Pendaftaran berhasil! Nomor Registrasi: ${res.payload.registrationNumber}`);
+    } else {
+      toast.error(res.payload ?? 'Gagal mengirim pendaftaran E-PPDB.');
+    }
   }
 
   return (

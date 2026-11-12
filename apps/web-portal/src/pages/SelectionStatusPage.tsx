@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Download, HelpCircle, Mail, MessageSquare, Share2 } from 'lucide-react';
+import { toast } from 'react-toastify';
 import { Badge, Button, Card } from '../components/atoms';
 import {
   ReEnrollmentGuide,
@@ -55,7 +56,10 @@ export function SelectionStatusPage() {
             variant="ghost"
             size="sm"
             leftIcon={<Share2 className="h-4 w-4" />}
-            onClick={() => navigator.clipboard?.writeText(window.location.href)}
+            onClick={() => {
+              navigator.clipboard?.writeText(window.location.href);
+              toast.success('Tautan pengumuman berhasil disalin ke clipboard.');
+            }}
           >
             Salin Tautan
           </Button>

@@ -1,5 +1,6 @@
 import { FormEvent } from 'react';
 import { Check, NotebookPen, Save, Upload } from 'lucide-react';
+import { toast } from 'react-toastify';
 import { useAppDispatch, useAppSelector } from '../../store';
 import {
   saveJournalDraft,
@@ -36,6 +37,7 @@ export function JournalEntryFormCard() {
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     dispatch(submitJournalRecord());
+    toast.success(`Jurnal KBM "${journalTopic}" berhasil disimpan dan disinkronkan ke SIAKAD.`);
   }
 
   return (

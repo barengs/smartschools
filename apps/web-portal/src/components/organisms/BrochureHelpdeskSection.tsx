@@ -1,14 +1,23 @@
+import { useMemo } from 'react';
+import { ColumnDef } from '@tanstack/react-table';
 import { ChevronRight, Download, Headphones, MessageSquare, PhoneCall, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { setFeeModalOpen } from '../../store/slices/ppdbPublicSlice';
 import { Button, Card, SectionHeading } from '../atoms';
+import { DataTable } from '../molecules';
+
+interface FeeRow {
+  component: string;
+  nominal: string;
+  notes: string;
+}
 
 export function BrochureHelpdeskSection() {
   const dispatch = useAppDispatch();
   const { overview, feeModalOpen } = useAppSelector((s) => s.ppdbPublic);
 
-  const feeSchedule = overview?.feeSchedule ?? [
+  const feeSchedule: FeeRow[] = overview?.feeSchedule ?? [
     {
       component: 'Biaya Pendaftaran & Seleksi CBT',
       nominal: 'Gratis (Rp 0)',
@@ -31,6 +40,31 @@ export function BrochureHelpdeskSection() {
     },
   ];
 
+  const columns = useMemo<ColumnDef<FeeRow, unknown>[]>(
+    () => [
+      {
+        accessorKey: 'component',
+        header: 'Komponen Biaya',
+        cell: ({ row }) => <span className="font-medium text-[#212529]">{row.original.component}</span>,
+      },
+      {
+        accessorKey: 'nominal',
+        header: 'Nominal',
+        cell: ({ row }) => (
+          <span className="font-semibold text-[#0d6efd] whitespace-nowrap tabular-nums">
+            {row.original.nominal}
+          </span>
+        ),
+      },
+      {
+        accessorKey: 'notes',
+        header: 'Keterangan',
+        cell: ({ row }) => <span className="text-[#6c757d]">{row.original.notes}</span>,
+      },
+    ],
+    [],
+  );
+
   return (
     <section id="biaya-ppdb" className="py-12 bg-[#f8f9fa]">
       <div className="bs-container" id="bantuan-ppdb">
@@ -41,7 +75,6 @@ export function BrochureHelpdeskSection() {
         />
 
         <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-12 items-start">
-          {/* Bootstrap Responsive Fee Schedule Table */}
           <Card padding="none" className="lg:col-span-7 overflow-hidden">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#dee2e6] bg-[#f8f9fa] px-5 py-3.5">
               <h3 className="text-base font-bold text-[#212529]">
@@ -56,31 +89,9 @@ export function BrochureHelpdeskSection() {
                 Pratinjau Brosur
               </Button>
             </div>
-            <div className="w-full overflow-x-auto">
-              <table className="w-full text-left border-collapse text-sm">
-                <thead className="bg-[#f8f9fa] border-b border-[#dee2e6] text-[#495057]">
-                  <tr>
-                    <th className="px-5 py-3 font-semibold">Komponen Biaya</th>
-                    <th className="px-5 py-3 font-semibold whitespace-nowrap">Nominal</th>
-                    <th className="px-5 py-3 font-semibold">Keterangan</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#dee2e6] bg-white">
-                  {feeSchedule.map((row) => (
-                    <tr key={row.component} className="hover:bg-[#f8f9fa]">
-                      <td className="px-5 py-3.5 font-medium text-[#212529]">{row.component}</td>
-                      <td className="px-5 py-3.5 font-semibold text-[#0d6efd] whitespace-nowrap tabular-nums">
-                        {row.nominal}
-                      </td>
-                      <td className="px-5 py-3.5 text-[#6c757d]">{row.notes}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <DataTable data={feeSchedule} columns={columns} />
           </Card>
 
-          {/* Helpdesk List-Group Card */}
           <Card padding="none" className="lg:col-span-5 overflow-hidden">
             <div className="bg-[#0d6efd] px-5 py-4 text-white">
               <div className="flex items-center gap-2.5">
@@ -127,13 +138,13 @@ export function BrochureHelpdeskSection() {
               <div className="px-5 py-4 bg-[#f8f9fa] flex flex-wrap gap-2">
                 <Link
                   to="/status-seleksi"
-                  className="inline-flex items-center justify-center rounded-md border border-[#0d6efd] bg-white px-4 py-2 text-sm font-semibold text-[#0d6efd] hover:bg-[#f8f9fa]"
+                  className="inline-flex items-center justify-center rounded border border-[#0d6efd] bg-white px-4 py-2 text-sm font-semibold text-[#0d6efd] hover:bg-[#f8f9fa]"
                 >
                   Cek Status Seleksi
                 </Link>
                 <Link
                   to="/ppdb"
-                  className="inline-flex items-center justify-center rounded-md bg-[#0d6efd] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0b5ed7]"
+                  className="inline-flex items-center justify-center rounded bg-[#0d6efd] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0b5ed7]"
                 >
                   Isi Formulir PPDB
                 </Link>
@@ -169,25 +180,8 @@ export function BrochureHelpdeskSection() {
                 <strong>{overview?.schoolName ?? 'SMA Negeri Nusantara Unggul'}</strong> untuk{' '}
                 <strong>{overview?.wave.title ?? 'TA 2026/2027 Gelombang 1'}</strong>:
               </p>
-              <div className="overflow-x-auto rounded-md border border-[#dee2e6]">
-                <table className="w-full text-left border-collapse text-sm">
-                  <thead className="bg-[#f8f9fa] border-b border-[#dee2e6]">
-                    <tr>
-                      <th className="px-4 py-2.5 font-semibold">Komponen</th>
-                      <th className="px-4 py-2.5 font-semibold">Nominal</th>
-                      <th className="px-4 py-2.5 font-semibold">Catatan</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#dee2e6]">
-                    {feeSchedule.map((item) => (
-                      <tr key={item.component}>
-                        <td className="px-4 py-2.5 font-medium">{item.component}</td>
-                        <td className="px-4 py-2.5 font-semibold text-[#0d6efd]">{item.nominal}</td>
-                        <td className="px-4 py-2.5 text-[#6c757d]">{item.notes}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="rounded border border-[#dee2e6] overflow-hidden">
+                <DataTable data={feeSchedule} columns={columns} compact />
               </div>
             </div>
             <div className="flex justify-end gap-2 border-t border-[#dee2e6] bg-[#f8f9fa] px-5 py-3">

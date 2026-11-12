@@ -1,5 +1,6 @@
 export { AchievementCard, TestimonialCard } from './AchievementCard';
 export { AuthFeatureItem } from './AuthFeatureItem';
+export { DataTable } from './DataTable';
 export { DocChecklistItem } from './DocChecklistItem';
 export { FormField } from './FormField';
 export { MapboxGeotagMap } from './MapboxGeotagMap';

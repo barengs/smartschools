@@ -1,9 +1,10 @@
 import { FormEvent, useState } from 'react';
 import { ArrowRight, Eye, EyeOff, Lock, QrCode, ShieldCheck, UserCheck } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { clearAuthError, loginUser, setRememberSession } from '../../store/slices/authSlice';
-import { Alert, Badge, Button, Card, Input } from '../atoms';
+import { Badge, Button, Card, Input } from '../atoms';
 import { FormField } from '../molecules';
 
 export function LoginFormPanel() {
@@ -14,16 +15,17 @@ export function LoginFormPanel() {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [instantHint, setInstantHint] = useState<string | null>(null);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    setInstantHint(null);
     const result = await dispatch(
       loginUser({ identifier: identifier.trim(), password, rememberSession }),
     );
     if (loginUser.fulfilled.match(result)) {
+      toast.success(`Selamat datang, ${result.payload.user.username}!`);
       navigate('/dashboard');
+    } else {
+      toast.error(result.payload ?? 'Gagal masuk ke akun SSO.');
     }
   }
 
@@ -45,17 +47,6 @@ export function LoginFormPanel() {
           Satu akun resmi untuk seluruh akses layanan akademik, kesiswaan, dan keuangan.
         </p>
       </div>
-
-      {error && (
-        <Alert tone="error" className="mt-4">
-          {error}
-        </Alert>
-      )}
-      {instantHint && (
-        <Alert tone="info" className="mt-4">
-          {instantHint}
-        </Alert>
-      )}
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         <FormField
@@ -81,7 +72,7 @@ export function LoginFormPanel() {
             <button
               type="button"
               onClick={() =>
-                setInstantHint('Hubungi Helpdesk TU (helpdesk@smartschool.sch.id) untuk reset sandi SSO.')
+                toast.info('Hubungi Helpdesk TU (helpdesk@smartschool.sch.id) untuk reset sandi SSO.')
               }
               className="text-xs font-bold text-[#163b8c] hover:underline cursor-pointer"
             >
@@ -153,7 +144,7 @@ export function LoginFormPanel() {
           variant="outline"
           size="md"
           onClick={() =>
-            setInstantHint(
+            toast.info(
               'OAuth2 Belajar.id / Google Workspace disiapkan via gateway SSO sekolah pada deployment produksi.',
             )
           }
@@ -165,7 +156,7 @@ export function LoginFormPanel() {
           size="md"
           leftIcon={<QrCode className="h-4 w-4 text-[#163b8c]" />}
           onClick={() =>
-            setInstantHint(
+            toast.info(
               'Tempelkan Kartu Pelajar RFID pada reader Kiosk atau pindai Dynamic QR melalui Student App.',
             )
           }

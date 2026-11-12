@@ -1,10 +1,14 @@
-import { useEffect } from 'react';
-import { Alert, Badge, Button, Card, Select } from '../components/atoms';
+import { useEffect, useMemo } from 'react';
+import { ColumnDef } from '@tanstack/react-table';
+import { toast } from 'react-toastify';
+import { Badge, Button, Card, Select } from '../components/atoms';
+import { DataTable } from '../components/molecules';
 import { PortalTopbar } from '../components/organisms';
 import { useAppDispatch, useAppSelector } from '../store';
 import {
   fetchPpdbApplications,
   migratePpdbApplication,
+  PpdbRow,
   setFilterStatus,
   verifyPpdbApplication,
 } from '../store/slices/ppdbAdminSlice';
@@ -16,6 +20,154 @@ export function PpdbAdminPage() {
   useEffect(() => {
     dispatch(fetchPpdbApplications(filterStatus));
   }, [dispatch, filterStatus]);
+
+  useEffect(() => {
+    if (message) toast.success(message);
+  }, [message]);
+
+  useEffect(() => {
+    if (error) toast.error(error);
+  }, [error]);
+
+  const columns = useMemo<ColumnDef<PpdbRow, unknown>[]>(
+    () => [
+      {
+        accessorKey: 'registration_number',
+        header: 'No. Reg',
+        cell: ({ row }) => (
+          <span className="font-bold text-[#0d6efd] tabular-nums">
+            {row.original.registration_number}
+          </span>
+        ),
+      },
+      {
+        accessorKey: 'full_name',
+        header: 'Nama Calon Siswa',
+        cell: ({ row }) => (
+          <div>
+            <div className="font-bold text-[#212529]">{row.original.full_name}</div>
+            {row.original.nis && (
+              <div className="text-xs text-[#6c757d] tabular-nums">NIS: {row.original.nis}</div>
+            )}
+          </div>
+        ),
+      },
+      {
+        accessorKey: 'admission_track',
+        header: 'Jalur',
+        cell: ({ row }) => <Badge tone="blue">{row.original.admission_track}</Badge>,
+      },
+      {
+        accessorKey: 'parent_name',
+        header: 'Orang Tua',
+        cell: ({ row }) => (
+          <div>
+            <div className="font-medium text-[#212529]">{row.original.parent_name}</div>
+            <div className="text-xs text-[#6c757d]">{row.original.parent_phone}</div>
+          </div>
+        ),
+      },
+      {
+        id: 'documents',
+        header: 'Berkas',
+        enableSorting: false,
+        cell: ({ row }) => (
+          <span className="text-[#495057]">{row.original.documents_jsonb?.length ?? 0} file</span>
+        ),
+      },
+      {
+        accessorKey: 'verification_status',
+        header: 'Status',
+        cell: ({ row }) => {
+          const st = row.original.verification_status;
+          return (
+            <Badge
+              tone={
+                st === 'MIGRATED' || st === 'ACCEPTED'
+                  ? 'emerald'
+                  : st === 'REJECTED'
+                    ? 'rose'
+                    : 'slate'
+              }
+            >
+              {st}
+            </Badge>
+          );
+        },
+      },
+      {
+        id: 'actions',
+        header: 'Aksi',
+        enableSorting: false,
+        cell: ({ row }) => {
+          const r = row.original;
+          return (
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {r.verification_status !== 'MIGRATED' && (
+                <>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() =>
+                      dispatch(
+                        verifyPpdbApplication({
+                          id: r.id,
+                          status: 'VERIFIED',
+                          filterStatus,
+                        }),
+                      )
+                    }
+                  >
+                    Verifikasi
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="emerald"
+                    onClick={() =>
+                      dispatch(
+                        verifyPpdbApplication({
+                          id: r.id,
+                          status: 'ACCEPTED',
+                          filterStatus,
+                        }),
+                      )
+                    }
+                  >
+                    Terima
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="danger"
+                    onClick={() =>
+                      dispatch(
+                        verifyPpdbApplication({
+                          id: r.id,
+                          status: 'REJECTED',
+                          filterStatus,
+                        }),
+                      )
+                    }
+                  >
+                    Tolak
+                  </Button>
+                </>
+              )}
+              {r.verification_status === 'ACCEPTED' && (
+                <Button
+                  size="sm"
+                  variant="primary"
+                  onClick={() => dispatch(migratePpdbApplication({ id: r.id, filterStatus }))}
+                >
+                  1-Click Migrate
+                </Button>
+              )}
+            </div>
+          );
+        },
+      },
+    ],
+    [dispatch, filterStatus],
+  );
 
   return (
     <div className="space-y-6">
@@ -40,128 +192,12 @@ export function PpdbAdminPage() {
         }
       />
 
-      {error && <Alert tone="error">{error}</Alert>}
-      {message && <Alert tone="success">{message}</Alert>}
-
       <Card padding="none" className="overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs sm:text-sm">
-            <thead>
-              <tr className="border-b border-slate-200 bg-slate-50 text-[11px] font-extrabold uppercase tracking-wider text-slate-500">
-                <th className="px-4 py-3">No. Reg</th>
-                <th className="px-4 py-3">Nama Calon Siswa</th>
-                <th className="px-4 py-3">Jalur</th>
-                <th className="px-4 py-3">Orang Tua</th>
-                <th className="px-4 py-3">Berkas</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Aksi</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 bg-white">
-              {rows.map((r) => (
-                <tr key={r.id} className="hover:bg-slate-50/70">
-                  <td className="px-4 py-3 font-bold text-[#163b8c] tabular-nums">
-                    {r.registration_number}
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="font-bold text-slate-900">{r.full_name}</div>
-                    {r.nis && <div className="text-xs text-slate-500 tabular-nums">NIS: {r.nis}</div>}
-                  </td>
-                  <td className="px-4 py-3">
-                    <Badge tone="blue">{r.admission_track}</Badge>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="font-medium text-slate-800">{r.parent_name}</div>
-                    <div className="text-xs text-slate-500">{r.parent_phone}</div>
-                  </td>
-                  <td className="px-4 py-3 text-slate-600">{r.documents_jsonb?.length ?? 0} file</td>
-                  <td className="px-4 py-3">
-                    <Badge
-                      tone={
-                        r.verification_status === 'MIGRATED' || r.verification_status === 'ACCEPTED'
-                          ? 'emerald'
-                          : r.verification_status === 'REJECTED'
-                            ? 'rose'
-                            : 'slate'
-                      }
-                    >
-                      {r.verification_status}
-                    </Badge>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      {r.verification_status !== 'MIGRATED' && (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() =>
-                              dispatch(
-                                verifyPpdbApplication({
-                                  id: r.id,
-                                  status: 'VERIFIED',
-                                  filterStatus,
-                                }),
-                              )
-                            }
-                          >
-                            Verifikasi
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="emerald"
-                            onClick={() =>
-                              dispatch(
-                                verifyPpdbApplication({
-                                  id: r.id,
-                                  status: 'ACCEPTED',
-                                  filterStatus,
-                                }),
-                              )
-                            }
-                          >
-                            Terima
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="danger"
-                            onClick={() =>
-                              dispatch(
-                                verifyPpdbApplication({
-                                  id: r.id,
-                                  status: 'REJECTED',
-                                  filterStatus,
-                                }),
-                              )
-                            }
-                          >
-                            Tolak
-                          </Button>
-                        </>
-                      )}
-                      {r.verification_status === 'ACCEPTED' && (
-                        <Button
-                          size="sm"
-                          variant="primary"
-                          onClick={() => dispatch(migratePpdbApplication({ id: r.id, filterStatus }))}
-                        >
-                          1-Click Migrate
-                        </Button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {rows.length === 0 && (
-                <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-slate-500">
-                    Belum ada data pendaftaran PPDB.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          data={rows}
+          columns={columns}
+          emptyMessage="Belum ada data pendaftaran PPDB."
+        />
       </Card>
     </div>
   );

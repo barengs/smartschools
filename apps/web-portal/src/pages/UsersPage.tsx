@@ -1,8 +1,11 @@
-import { FormEvent, useEffect, useState } from 'react';
-import { Alert, Badge, Button, Card, Input, Select } from '../components/atoms';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { ColumnDef } from '@tanstack/react-table';
+import { toast } from 'react-toastify';
+import { Badge, Button, Card, Input, Select } from '../components/atoms';
+import { DataTable } from '../components/molecules';
 import { PortalTopbar } from '../components/organisms';
 import { useAppDispatch, useAppSelector } from '../store';
-import { createUserAccount, fetchUsersAndRoles } from '../store/slices/usersSlice';
+import { createUserAccount, fetchUsersAndRoles, UserRow } from '../store/slices/usersSlice';
 
 export function UsersPage() {
   const dispatch = useAppDispatch();
@@ -16,6 +19,14 @@ export function UsersPage() {
   useEffect(() => {
     dispatch(fetchUsersAndRoles());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (message) toast.success(message);
+  }, [message]);
+
+  useEffect(() => {
+    if (error) toast.error(error);
+  }, [error]);
 
   async function handleCreate(e: FormEvent) {
     e.preventDefault();
@@ -34,6 +45,45 @@ export function UsersPage() {
     }
   }
 
+  const columns = useMemo<ColumnDef<UserRow, unknown>[]>(
+    () => [
+      {
+        accessorKey: 'username',
+        header: 'Username',
+        cell: ({ row }) => <span className="font-bold text-[#212529]">{row.original.username}</span>,
+      },
+      {
+        accessorKey: 'email',
+        header: 'Email',
+        cell: ({ row }) => <span className="text-[#495057]">{row.original.email ?? '-'}</span>,
+      },
+      {
+        id: 'roles',
+        header: 'Peran (RBAC)',
+        enableSorting: false,
+        cell: ({ row }) => (
+          <div className="flex items-center gap-1 flex-wrap">
+            {row.original.roles.map((role) => (
+              <Badge key={role} tone="blue">
+                {role}
+              </Badge>
+            ))}
+          </div>
+        ),
+      },
+      {
+        accessorKey: 'is_active',
+        header: 'Status',
+        cell: ({ row }) => (
+          <Badge tone={row.original.is_active ? 'emerald' : 'slate'}>
+            {row.original.is_active ? 'Aktif' : 'Nonaktif'}
+          </Badge>
+        ),
+      },
+    ],
+    [],
+  );
+
   return (
     <div className="space-y-6">
       <PortalTopbar
@@ -41,11 +91,8 @@ export function UsersPage() {
         subtitle="Kelola identitas warga sekolah terpusat dengan otorisasi peran JWT RS256."
       />
 
-      {error && <Alert tone="error">{error}</Alert>}
-      {message && <Alert tone="success">{message}</Alert>}
-
       <Card padding="lg" className="space-y-4">
-        <h2 className="text-base font-extrabold text-slate-900">Tambah Akun Baru</h2>
+        <h2 className="text-base font-bold text-[#212529]">Tambah Akun Baru</h2>
         <form onSubmit={handleCreate} className="grid grid-cols-1 sm:grid-cols-5 gap-3">
           <Input
             placeholder="Username"
@@ -81,40 +128,7 @@ export function UsersPage() {
       </Card>
 
       <Card padding="none" className="overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs sm:text-sm">
-            <thead>
-              <tr className="border-b border-slate-200 bg-slate-50 text-[11px] font-extrabold uppercase tracking-wider text-slate-500">
-                <th className="px-4 py-3">Username</th>
-                <th className="px-4 py-3">Email</th>
-                <th className="px-4 py-3">Peran (RBAC)</th>
-                <th className="px-4 py-3">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 bg-white">
-              {users.map((u) => (
-                <tr key={u.id}>
-                  <td className="px-4 py-3 font-bold text-slate-900">{u.username}</td>
-                  <td className="px-4 py-3 text-slate-600">{u.email ?? '-'}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-1 flex-wrap">
-                      {u.roles.map((role) => (
-                        <Badge key={role} tone="blue">
-                          {role}
-                        </Badge>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <Badge tone={u.is_active ? 'emerald' : 'slate'}>
-                      {u.is_active ? 'Aktif' : 'Nonaktif'}
-                    </Badge>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <DataTable data={users} columns={columns} emptyMessage="Belum ada data pengguna." />
       </Card>
     </div>
   );
