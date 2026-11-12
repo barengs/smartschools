@@ -15,11 +15,12 @@ import {
   AdmissionTrack,
   markChecklistUploaded,
   PpdbDraftForm,
+  SCHOOL_GATE_COORDS,
   setWizardStep,
   updateDraftField,
 } from '../../store/slices/ppdbPublicSlice';
 import { Alert, Badge, Button, Card, Input, Select } from '../atoms';
-import { FormField } from '../molecules';
+import { FormField, MapboxGeotagMap } from '../molecules';
 
 interface PpdbWizardStepContentProps {
   onFinalSubmit: () => void;
@@ -60,7 +61,7 @@ export function PpdbWizardStepContent({ onFinalSubmit }: PpdbWizardStepContentPr
       {/* Jalur banner matching screenshot 4 */}
       <Card padding="sm" className="bg-blue-50/70 border-blue-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white border border-blue-200 text-[#163b8c]">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-white border border-blue-200 text-[#163b8c]">
             <MapPin className="h-5 w-5" />
           </div>
           <div>
@@ -289,80 +290,50 @@ export function PpdbWizardStepContent({ onFinalSubmit }: PpdbWizardStepContentPr
               </FormField>
             </div>
 
-            {/* Interactive stylized contour map matching screenshot 4 */}
-            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-[#edf3ff]">
-              <div className="relative h-52 sm:h-60 w-full flex items-center justify-center">
-                <div
-                  className="absolute inset-0 opacity-60"
-                  style={{
-                    backgroundImage:
-                      'linear-gradient(to right, rgba(22,59,140,0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(22,59,140,0.08) 1px, transparent 1px)',
-                    backgroundSize: '28px 28px',
-                  }}
-                />
-                <div className="absolute top-3 left-3 rounded-xl bg-white/95 border border-slate-200 px-3 py-2 shadow-xs">
-                  <div className="text-[11px] font-extrabold text-slate-900">
-                    Tampilan Satelit &amp; Peta Kontur Zonasi
-                  </div>
-                  <div className="text-[10px] text-slate-500">
-                    Akurasi Satelit: ± 1.5 Meter (Galileo + GPS GLONASS)
-                  </div>
-                </div>
-
-                {/* Zone circle + pin */}
-                <div className="relative flex items-center justify-center">
-                  <div className="h-36 w-36 rounded-full border-2 border-dashed border-[#163b8c]/35 bg-[#163b8c]/10 flex items-center justify-center">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#163b8c] text-white shadow-lg shadow-blue-900/30">
-                      <MapPin className="h-6 w-6" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white px-4 py-2.5 border-t border-slate-200 text-xs">
-                <span className="inline-flex items-center gap-1.5 font-semibold text-emerald-700">
-                  <CheckCircle2 className="h-4 w-4" />
-                  Titik Terkunci Sesuai Basis Data Geo-Dukcapil
-                </span>
-                <button
-                  type="button"
-                  onClick={handleUseGps}
-                  className="text-xs font-bold text-[#163b8c] hover:underline cursor-pointer"
-                >
-                  Koreksi Manual Pin
-                </button>
-              </div>
-            </div>
+            {/* Interactive Mapbox GL JS map */}
+            <MapboxGeotagMap
+              schoolLat={SCHOOL_GATE_COORDS.lat}
+              schoolLng={SCHOOL_GATE_COORDS.lng}
+              studentLat={
+                draft.latitude.trim() && Number.isFinite(Number(draft.latitude))
+                  ? Number(draft.latitude)
+                  : null
+              }
+              studentLng={
+                draft.longitude.trim() && Number.isFinite(Number(draft.longitude))
+                  ? Number(draft.longitude)
+                  : null
+              }
+              onSelectLocation={(lat, lng) => {
+                setField('latitude', lat);
+                setField('longitude', lng);
+              }}
+            />
 
             {/* Haversine Distance Result Box */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded border border-[#dee2e6] bg-[#f8f9fa] p-4">
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-700 text-white shrink-0 font-extrabold text-xs">
+                <div className="flex h-10 w-10 items-center justify-center rounded bg-[#0d6efd] text-white shrink-0 font-bold text-xs">
                   GPS
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-800">
-                      HASIL PERHITUNGAN HAVERSINE
+                    <span className="text-xs font-semibold text-[#495057]">
+                      Hasil Perhitungan Haversine
                     </span>
-                    <Badge tone="emerald">Zonasi Valid</Badge>
+                    {distanceMeters > 0 ? (
+                      <Badge tone={distanceMeters <= 1500 ? 'emerald' : 'amber'}>
+                        {distanceMeters <= 1500 ? 'Dalam Radius Zonasi' : 'Di Luar Radius 1.500m'}
+                      </Badge>
+                    ) : (
+                      <Badge tone="slate">Belum Ada Koordinat</Badge>
+                    )}
                   </div>
-                  <div className="text-xl font-extrabold text-slate-900 tabular-nums">
-                    {distanceMeters} Meter{' '}
-                    <span className="text-xs font-medium text-slate-600">
-                      dari Gerbang SMA Nusantara Unggul
-                    </span>
+                  <div className="text-lg font-bold text-[#212529] tabular-nums">
+                    {distanceMeters > 0
+                      ? `${distanceMeters} Meter dari Gerbang Sekolah`
+                      : 'Klik peta Mapbox atau tekan tombol GPS'}
                   </div>
-                </div>
-              </div>
-
-              <div className="rounded-xl bg-white border border-emerald-200 px-3.5 py-2 text-xs">
-                <div className="font-bold text-emerald-800 flex items-center gap-1">
-                  <CheckCircle2 className="h-3.5 w-3.5" />
-                  <span>Memenuhi Kuota Zonasi Utama Murni</span>
-                </div>
-                <div className="text-[11px] text-slate-500 mt-0.5">
-                  Peringkat Jarak Sementara: Ke-14 dari kuota 240 siswa
                 </div>
               </div>
             </div>
@@ -422,7 +393,7 @@ export function PpdbWizardStepContent({ onFinalSubmit }: PpdbWizardStepContentPr
                   ).map((opt) => (
                     <label
                       key={opt.key}
-                      className={`flex items-center gap-2 rounded-xl border px-2.5 py-2 cursor-pointer ${
+                      className={`flex items-center gap-2 rounded border px-2.5 py-2 cursor-pointer ${
                         draft.housingStatus === opt.key
                           ? 'border-[#163b8c] bg-blue-50 text-[#163b8c] font-bold'
                           : 'border-slate-200 text-slate-600'
@@ -504,7 +475,7 @@ export function PpdbWizardStepContent({ onFinalSubmit }: PpdbWizardStepContentPr
             {checklist.map((doc) => (
               <div
                 key={doc.code}
-                className="rounded-xl border border-slate-200 p-4 flex flex-col justify-between gap-3"
+                className="rounded border border-slate-200 p-4 flex flex-col justify-between gap-3"
               >
                 <div>
                   <div className="flex items-center justify-between gap-2">
@@ -516,7 +487,7 @@ export function PpdbWizardStepContent({ onFinalSubmit }: PpdbWizardStepContentPr
                   <div className="text-xs text-slate-500 mt-1">{doc.fileName}</div>
                 </div>
                 {doc.code !== 'GEOTAG' && (
-                  <label className="inline-flex cursor-pointer items-center justify-center rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-100">
+                  <label className="inline-flex cursor-pointer items-center justify-center rounded border border-slate-300 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-100">
                     <span>Pilih Berkas PDF / JPG</span>
                     <input
                       type="file"
@@ -588,7 +559,7 @@ export function PpdbWizardStepContent({ onFinalSubmit }: PpdbWizardStepContentPr
                   key={m.id}
                   type="button"
                   onClick={() => setField('paymentMethod', m.id)}
-                  className={`rounded-xl border p-3.5 text-left transition-colors cursor-pointer ${
+                  className={`rounded border p-3.5 text-left transition-colors cursor-pointer ${
                     draft.paymentMethod === m.id
                       ? 'border-[#163b8c] bg-blue-50 text-[#163b8c]'
                       : 'border-slate-200 hover:bg-slate-50'

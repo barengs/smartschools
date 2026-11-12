@@ -11,7 +11,7 @@ export function DocChecklistItem({ item, onPreview }: DocChecklistItemProps) {
 
   return (
     <div
-      className={`flex items-center justify-between gap-2.5 rounded-xl border px-3 py-2.5 text-xs ${
+      className={`flex items-center justify-between gap-2.5 rounded border px-3 py-2.5 text-xs ${
         isRequired
           ? 'border-rose-200 bg-rose-50/70 text-rose-950'
           : 'border-slate-200 bg-slate-50/70 text-slate-800'

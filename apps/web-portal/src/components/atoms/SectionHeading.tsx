@@ -17,32 +17,32 @@ export function SectionHeading({
 }: SectionHeadingProps) {
   if (align === 'center') {
     return (
-      <div className="mx-auto max-w-2xl text-center">
+      <div className="mx-auto max-w-3xl text-center">
         {kicker && (
-          <p className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#163b8c] mb-2">
+          <p className="text-sm font-semibold text-[#0d6efd] mb-1">
             {kicker}
           </p>
         )}
-        <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
+        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#212529]">
           {title}
         </h2>
-        {subtitle && <p className="mt-2.5 text-sm sm:text-base text-slate-600">{subtitle}</p>}
+        {subtitle && <p className="mt-2 text-base text-[#6c757d]">{subtitle}</p>}
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-      <div className="max-w-2xl">
+    <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[#dee2e6] pb-4">
+      <div className="max-w-3xl">
         {kicker && (
-          <p className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#163b8c] mb-1.5">
+          <p className="text-sm font-semibold text-[#0d6efd] mb-1">
             {kicker}
           </p>
         )}
-        <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
+        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#212529]">
           {title}
         </h2>
-        {subtitle && <p className="mt-2 text-sm text-slate-600">{subtitle}</p>}
+        {subtitle && <p className="mt-1.5 text-base text-[#6c757d]">{subtitle}</p>}
       </div>
       {rightSlot && <div className="shrink-0">{rightSlot}</div>}
     </div>

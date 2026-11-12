@@ -7,10 +7,10 @@ export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextArea
 export function Textarea({ hasError = false, className = '', ...rest }: TextareaProps) {
   return (
     <textarea
-      className={`w-full rounded-xl border bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:outline-none focus:ring-2 ${
+      className={`w-full rounded border bg-white px-3 py-2 text-base text-[#212529] placeholder:text-[#6c757d] transition-colors focus:outline-none focus:ring-2 ${
         hasError
-          ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-100'
-          : 'border-slate-300 focus:border-blue-600 focus:ring-blue-100'
+          ? 'border-[#dc3545] focus:border-[#dc3545] focus:ring-[#dc3545]/25'
+          : 'border-[#ced4da] focus:border-[#86b7fe] focus:ring-[#0d6efd]/25'
       } ${className}`}
       {...rest}
     />

@@ -16,7 +16,7 @@ export function TeacherJournalPage() {
         subtitle="Input cepat jurnal mengajar harian, presensi real-time per jam tatap muka, dan sinkronisasi otomatis SIAKAD."
         rightSlot={
           <Card padding="sm" className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#163b8c] text-xs font-extrabold text-white shrink-0">
+            <div className="flex h-10 w-10 items-center justify-center rounded bg-[#163b8c] text-xs font-extrabold text-white shrink-0">
               BS
             </div>
             <div className="text-xs leading-tight">
@@ -33,9 +33,9 @@ export function TeacherJournalPage() {
       />
 
       {/* Active Session Banner matching Screenshot 2 */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl bg-gradient-to-r from-[#0f2b6b] to-[#1d4ed8] px-5 py-4 text-white shadow-md">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded bg-gradient-to-r from-[#0f2b6b] to-[#1d4ed8] px-5 py-4 text-white shadow-md">
         <div className="flex items-start gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 shrink-0">
+          <div className="flex h-9 w-9 items-center justify-center rounded bg-white/15 shrink-0">
             <Clock className="h-5 w-5 text-blue-100" />
           </div>
           <div>
@@ -62,7 +62,7 @@ export function TeacherJournalPage() {
           onClick={() =>
             document.getElementById('journal-attendance-panel')?.scrollIntoView({ behavior: 'smooth' })
           }
-          className="inline-flex items-center gap-1.5 rounded-xl bg-white px-4 py-2 text-xs font-extrabold text-[#0f2b6b] shadow-xs hover:bg-blue-50 shrink-0 cursor-pointer"
+          className="inline-flex items-center gap-1.5 rounded bg-white px-4 py-2 text-xs font-extrabold text-[#0f2b6b] shadow-xs hover:bg-blue-50 shrink-0 cursor-pointer"
         >
           <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
           <span>Presensi</span>

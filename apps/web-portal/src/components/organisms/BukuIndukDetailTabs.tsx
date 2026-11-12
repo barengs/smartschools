@@ -69,7 +69,7 @@ export function BukuIndukDetailTabs({ student }: BukuIndukDetailTabsProps) {
   return (
     <div className="space-y-5">
       {/* Navigation Tab Strip */}
-      <div className="flex flex-wrap items-center gap-1.5 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-2xs">
+      <div className="flex flex-wrap items-center gap-1.5 rounded border border-slate-200 bg-white p-1.5 shadow-2xs">
         {TABS.map((t) => {
           const active = activeTab === t.key;
           return (
@@ -77,7 +77,7 @@ export function BukuIndukDetailTabs({ student }: BukuIndukDetailTabsProps) {
               key={t.key}
               type="button"
               onClick={() => dispatch(setBukuIndukActiveTab(t.key))}
-              className={`rounded-xl px-3.5 py-2 text-xs font-bold transition-colors cursor-pointer ${
+              className={`rounded px-3.5 py-2 text-xs font-bold transition-colors cursor-pointer ${
                 active
                   ? 'bg-[#163b8c] text-white shadow-xs'
                   : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
@@ -197,7 +197,7 @@ export function BukuIndukDetailTabs({ student }: BukuIndukDetailTabsProps) {
                       <Badge tone={row.grade === 'A' ? 'emerald' : 'blue'}>{row.grade}</Badge>
                     </td>
                     <td className="px-4 py-3.5 text-right">
-                      <span className="inline-flex items-center gap-1 rounded-lg border border-emerald-200 bg-emerald-50 px-2 py-1 text-[10px] font-extrabold text-emerald-700">
+                      <span className="inline-flex items-center gap-1 rounded border border-emerald-200 bg-emerald-50 px-2 py-1 text-[10px] font-extrabold text-emerald-700">
                         <CheckCircle2 className="h-3 w-3" />
                         <span>TTE Sah BSrE</span>
                       </span>
@@ -221,7 +221,7 @@ export function BukuIndukDetailTabs({ student }: BukuIndukDetailTabsProps) {
                 — {student.homeroomTeacher}
               </div>
             </div>
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-slate-300 bg-white text-[#163b8c]">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded border border-slate-300 bg-white text-[#163b8c]">
               <QrCode className="h-7 w-7" />
             </div>
           </div>
@@ -239,7 +239,7 @@ export function BukuIndukDetailTabs({ student }: BukuIndukDetailTabsProps) {
               { period: 'TA 2025/2026 Genap', rombel: 'Kelas X MIPA 1', status: 'NAIK KELAS', wali: 'Drs. Bambang Sudarmono, M.Si' },
               { period: 'TA 2025/2026 Ganjil', rombel: 'Kelas X MIPA 1', status: 'MIGRASI E-PPDB', wali: 'Drs. Bambang Sudarmono, M.Si' },
             ].map((hist) => (
-              <div key={hist.period} className="flex items-center justify-between rounded-xl border border-slate-200 p-3.5">
+              <div key={hist.period} className="flex items-center justify-between rounded border border-slate-200 p-3.5">
                 <div>
                   <div className="font-extrabold text-slate-900">{hist.period} · {hist.rombel}</div>
                   <div className="text-slate-500 mt-0.5">Wali Kelas: {hist.wali}</div>
@@ -318,7 +318,7 @@ export function BukuIndukDetailTabs({ student }: BukuIndukDetailTabsProps) {
             { title: 'Nama Ibu Kandung', value: student.motherName, sub: 'Tanpa Gelar (Sesuai Akta)' },
             { title: 'Geotagging Titik Rumah', value: student.geotagCoords, sub: 'Radius Zonasi Valid' },
           ].map((chk) => (
-            <div key={chk.title} className="rounded-xl border border-slate-200 bg-slate-50/70 p-3">
+            <div key={chk.title} className="rounded border border-slate-200 bg-slate-50/70 p-3">
               <div className="flex items-center justify-between gap-1 text-[11px] font-bold text-slate-600">
                 <span>{chk.title}</span>
                 <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />

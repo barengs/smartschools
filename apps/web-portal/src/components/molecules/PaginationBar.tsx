@@ -26,7 +26,7 @@ export function PaginationBar({
           type="button"
           disabled={currentPage <= 1}
           onClick={() => onPageChange(currentPage - 1)}
-          className="rounded-lg border border-slate-200 px-2.5 py-1 font-semibold hover:bg-slate-50 disabled:opacity-45 cursor-pointer"
+          className="rounded border border-slate-200 px-2.5 py-1 font-semibold hover:bg-slate-50 disabled:opacity-45 cursor-pointer"
         >
           Sebelumnya
         </button>
@@ -38,7 +38,7 @@ export function PaginationBar({
               key={p}
               type="button"
               onClick={() => onPageChange(p)}
-              className={`h-7 min-w-7 rounded-lg px-2 font-bold tabular-nums cursor-pointer ${
+              className={`h-7 min-w-7 rounded px-2 font-bold tabular-nums cursor-pointer ${
                 active
                   ? 'bg-[#163b8c] text-white'
                   : 'border border-slate-200 text-slate-700 hover:bg-slate-50'
@@ -52,7 +52,7 @@ export function PaginationBar({
           type="button"
           disabled={currentPage >= totalPages}
           onClick={() => onPageChange(currentPage + 1)}
-          className="rounded-lg border border-slate-200 px-2.5 py-1 font-semibold hover:bg-slate-50 disabled:opacity-45 cursor-pointer"
+          className="rounded border border-slate-200 px-2.5 py-1 font-semibold hover:bg-slate-50 disabled:opacity-45 cursor-pointer"
         >
           Selanjutnya
         </button>

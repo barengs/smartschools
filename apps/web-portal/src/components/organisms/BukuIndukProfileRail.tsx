@@ -37,7 +37,7 @@ export function BukuIndukProfileRail({ student }: BukuIndukProfileRailProps) {
       {/* Main Student Profile Card */}
       <Card padding="md" className="space-y-4">
         <div className="flex items-start gap-3.5">
-          <div className="flex h-16 w-14 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#0f2b6b] to-blue-600 text-base font-extrabold text-white shadow-xs">
+          <div className="flex h-16 w-14 shrink-0 items-center justify-center rounded bg-gradient-to-br from-[#0f2b6b] to-blue-600 text-base font-extrabold text-white shadow-xs">
             {initials}
           </div>
           <div className="min-w-0 flex-1">
@@ -63,17 +63,17 @@ export function BukuIndukProfileRail({ student }: BukuIndukProfileRailProps) {
         </div>
 
         <div className="grid grid-cols-2 gap-2.5 text-xs">
-          <div className="rounded-xl border border-slate-200 bg-slate-50 p-2.5">
+          <div className="rounded border border-slate-200 bg-slate-50 p-2.5">
             <div className="text-[10px] font-bold text-slate-500">KIP / PIP</div>
             <div className="font-extrabold text-slate-900 mt-0.5">{student.kipPipStatus}</div>
           </div>
-          <div className="rounded-xl border border-slate-200 bg-slate-50 p-2.5">
+          <div className="rounded border border-slate-200 bg-slate-50 p-2.5">
             <div className="text-[10px] font-bold text-slate-500">Gol. Darah</div>
             <div className="font-extrabold text-slate-900 mt-0.5">{student.bloodType}</div>
           </div>
         </div>
 
-        <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2.5 text-xs">
+        <div className="flex items-center justify-between rounded border border-slate-200 bg-slate-50/70 px-3 py-2.5 text-xs">
           <div className="flex items-center gap-2 min-w-0">
             <CreditCard className="h-4 w-4 text-[#163b8c] shrink-0" />
             <div className="min-w-0">
@@ -91,7 +91,7 @@ export function BukuIndukProfileRail({ student }: BukuIndukProfileRailProps) {
             DATA ORANG TUA &amp; KONTAK VALID
           </div>
 
-          <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs">
+          <div className="flex items-center justify-between rounded border border-slate-200 bg-white px-3 py-2 text-xs">
             <div>
               <div className="font-bold text-slate-900">{student.fatherName}</div>
               <div className="text-[11px] text-slate-500">{student.fatherJob}</div>
@@ -99,7 +99,7 @@ export function BukuIndukProfileRail({ student }: BukuIndukProfileRailProps) {
             {student.nikMatch && <Badge tone="emerald">NIK Match</Badge>}
           </div>
 
-          <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs">
+          <div className="flex items-center justify-between rounded border border-slate-200 bg-white px-3 py-2 text-xs">
             <div>
               <div className="font-bold text-slate-900">{student.motherName}</div>
               <div className="text-[11px] text-slate-500">{student.motherJob}</div>
@@ -107,7 +107,7 @@ export function BukuIndukProfileRail({ student }: BukuIndukProfileRailProps) {
             {student.nikMatch && <Badge tone="emerald">NIK Match</Badge>}
           </div>
 
-          <div className="flex items-center justify-between rounded-xl border border-blue-100 bg-blue-50/50 px-3 py-2 text-xs">
+          <div className="flex items-center justify-between rounded border border-blue-100 bg-blue-50/50 px-3 py-2 text-xs">
             <div>
               <div className="font-bold text-slate-900 tabular-nums">{student.parentPhone}</div>
               <div className="text-[10px] font-semibold text-emerald-700">
@@ -138,7 +138,7 @@ export function BukuIndukProfileRail({ student }: BukuIndukProfileRailProps) {
           {LEGAL_FILES.map((file) => (
             <div
               key={file.name}
-              className="flex items-center justify-between gap-2 rounded-xl border border-slate-200 bg-slate-50/60 px-3 py-2 text-xs"
+              className="flex items-center justify-between gap-2 rounded border border-slate-200 bg-slate-50/60 px-3 py-2 text-xs"
             >
               <div className="flex items-center gap-2.5 min-w-0">
                 <FileText className="h-4 w-4 text-rose-600 shrink-0" />
@@ -188,7 +188,7 @@ export function BukuIndukProfileRail({ student }: BukuIndukProfileRailProps) {
             key={label}
             type="button"
             onClick={() => setRailNotice(`Memproses permintaan: ${label} untuk ${student.fullName}.`)}
-            className="flex w-full items-center justify-between rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-blue-50 hover:text-[#163b8c] transition-colors cursor-pointer"
+            className="flex w-full items-center justify-between rounded border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-blue-50 hover:text-[#163b8c] transition-colors cursor-pointer"
           >
             <span>{label}</span>
             <ChevronRight className="h-3.5 w-3.5 text-slate-400" />

@@ -1,129 +1,131 @@
 import { Download } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store';
 import {
-  SELECTION_CANDIDATE_DIRECTORY,
+  fetchPublicSelectionResults,
   setLookupQuery,
   setLookupTrack,
-  runSelectionLookup,
   setRecapPage,
   setRecapSearch,
   setRecapTab,
 } from '../../store/slices/ppdbPublicSlice';
 import { Badge, Button, Card, SectionHeading } from '../atoms';
-import { PaginationBar, SearchFilterBar, StatCard } from '../molecules';
+import { PaginationBar, SearchFilterBar } from '../molecules';
 
-const QUOTA_CARDS = [
-  { label: 'Zonasi Murni (50%)', value: '150 Kursi', sublabel: 'Passing Grade Jarak: 690 m' },
-  { label: 'Prestasi Akademik (25%)', value: '75 Kursi', sublabel: 'Rata-rata Skor: 92.60' },
-  { label: 'Afirmasi / KETM (15%)', value: '45 Kursi', sublabel: 'Terverifikasi DTKS Kemensos' },
-  { label: 'Mutasi & Pendidik (10%)', value: '30 Kursi', sublabel: 'Surat Tugas Dinas Valid' },
-];
+const TRACK_LABELS: Record<string, { label: string; cap: string }> = {
+  ZONASI: { label: 'Zonasi Domisili (50%)', cap: '120 Kursi' },
+  PRESTASI: { label: 'Prestasi Akademik (30%)', cap: '72 Kursi' },
+  AFIRMASI: { label: 'Afirmasi KIP/PIP (15%)', cap: '36 Kursi' },
+  MUTASI: { label: 'Mutasi Orang Tua (5%)', cap: '12 Kursi' },
+};
 
 export function SelectionRecapSection() {
   const dispatch = useAppDispatch();
-  const { recapTab, recapSearch, recapPage, lookupQuery } = useAppSelector((s) => s.ppdbPublic);
+  const {
+    recapTab,
+    recapSearch,
+    recapPage,
+    lookupQuery,
+    recapItems,
+    recapTotalAccepted,
+    recapTotalWaitlist,
+    recapTotalItems,
+    trackRecap,
+  } = useAppSelector((s) => s.ppdbPublic);
 
-  const filtered = SELECTION_CANDIDATE_DIRECTORY.filter((row) => {
-    const matchesTab =
-      recapTab === 'ACCEPTED'
-        ? row.status === 'LULUS UTAMA'
-        : row.status !== 'LULUS UTAMA';
-    const q = recapSearch.trim().toLowerCase();
-    const matchesQuery =
-      !q ||
-      row.registrationNumber.toLowerCase().includes(q) ||
-      row.fullName.toLowerCase().includes(q) ||
-      row.previousSchool.toLowerCase().includes(q);
-    return matchesTab && matchesQuery;
-  });
-
-  const pageSize = 5;
-  const paged = filtered.slice((recapPage - 1) * pageSize, recapPage * pageSize);
+  const pageSize = 6;
 
   return (
-    <section className="space-y-5">
+    <section className="space-y-6">
       <SectionHeading
-        kicker="KETERBUKAAN DATA PUBLIK"
+        kicker="Keterbukaan Data Publik"
         title="Rekapitulasi Kuota & Hasil Seleksi Terbuka"
         rightSlot={
-          <div className="text-xs font-semibold text-slate-600">
-            Total Pendaftar Masuk: <strong className="text-slate-900">1.240 Berkas</strong> · Target
-            Kursi Utama: <strong className="text-emerald-700">300 Siswa (100% Kuota)</strong>
+          <div className="text-sm text-[#495057]">
+            Diterima: <strong className="text-[#198754]">{recapTotalAccepted}</strong> · Cadangan:{' '}
+            <strong className="text-[#212529]">{recapTotalWaitlist}</strong>
           </div>
         }
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {QUOTA_CARDS.map((q) => (
-          <div key={q.label} className="relative">
-            <StatCard value={q.value} label={q.label} sublabel={q.sublabel} />
-            <span className="absolute top-3.5 right-3.5 rounded-full bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
-              100% Kuota
-            </span>
-          </div>
-        ))}
+        {(['ZONASI', 'PRESTASI', 'AFIRMASI', 'MUTASI'] as const).map((code) => {
+          const live = trackRecap.find((t) => t.code === code);
+          const meta = TRACK_LABELS[code];
+          return (
+            <div
+              key={code}
+              className="rounded border border-[#dee2e6] bg-white p-4 flex flex-col justify-between"
+            >
+              <div className="text-xs font-medium text-[#6c757d]">{meta.label}</div>
+              <div className="mt-1 text-xl font-bold text-[#212529]">{meta.cap}</div>
+              <div className="mt-2 text-xs text-[#198754] font-semibold">
+                {live ? `${live.acceptedCount} lulus dari ${live.totalCount} pendaftar` : 'Terverifikasi'}
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       <Card padding="none" className="overflow-hidden">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 p-4 bg-slate-50/70">
-          <div className="inline-flex rounded-xl bg-slate-200/70 p-1 self-start">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#dee2e6] p-4 bg-[#f8f9fa]">
+          <div className="inline-flex rounded-md border border-[#dee2e6] bg-white p-1 self-start">
             <button
               type="button"
               onClick={() => dispatch(setRecapTab('ACCEPTED'))}
-              className={`rounded-lg px-3.5 py-1.5 text-xs font-bold transition-colors cursor-pointer ${
+              className={`rounded px-3.5 py-1.5 text-sm font-semibold transition-colors cursor-pointer ${
                 recapTab === 'ACCEPTED'
-                  ? 'bg-white text-[#163b8c] shadow-2xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#0d6efd] text-white'
+                  : 'text-[#495057] hover:bg-[#f8f9fa]'
               }`}
             >
-              Daftar Diterima (300)
+              Daftar Diterima ({recapTotalAccepted})
             </button>
             <button
               type="button"
               onClick={() => dispatch(setRecapTab('WAITLIST'))}
-              className={`rounded-lg px-3.5 py-1.5 text-xs font-bold transition-colors cursor-pointer ${
+              className={`rounded px-3.5 py-1.5 text-sm font-semibold transition-colors cursor-pointer ${
                 recapTab === 'WAITLIST'
-                  ? 'bg-white text-[#163b8c] shadow-2xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#0d6efd] text-white'
+                  : 'text-[#495057] hover:bg-[#f8f9fa]'
               }`}
             >
-              Daftar Cadangan / Waiting List (24)
+              Daftar Cadangan ({recapTotalWaitlist})
             </button>
           </div>
 
           <SearchFilterBar
             value={recapSearch}
             onChange={(val) => dispatch(setRecapSearch(val))}
-            placeholder="Cari nama atau nomor..."
+            placeholder="Cari nama atau nomor registrasi..."
             rightSlot={
               <Button
                 variant="outline"
                 size="sm"
-                leftIcon={<Download className="h-3.5 w-3.5" />}
+                leftIcon={<Download className="h-4 w-4" />}
                 onClick={() => window.print()}
               >
-                Cetak / Ekspor
+                Cetak Tabel
               </Button>
             }
           />
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs">
+        <div className="w-full overflow-x-auto">
+          <table className="w-full text-left border-collapse text-sm">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50 text-[11px] font-extrabold uppercase tracking-wider text-slate-500">
+              <tr className="border-b border-[#dee2e6] bg-[#f8f9fa] text-xs font-semibold uppercase text-[#495057]">
                 <th className="px-4 py-3">No</th>
-                <th className="px-4 py-3">No. Registrasi</th>
+                <th className="px-4 py-3 whitespace-nowrap">No. Registrasi</th>
                 <th className="px-4 py-3">Nama Calon Siswa</th>
                 <th className="px-4 py-3">Sekolah Asal</th>
                 <th className="px-4 py-3">Jalur</th>
                 <th className="px-4 py-3">Skor Akhir</th>
-                <th className="px-4 py-3">Status Kelulusan</th>
+                <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Area</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 bg-white">
-              {paged.map((row) => {
+            <tbody className="divide-y divide-[#dee2e6] bg-white">
+              {recapItems.map((row) => {
                 const isSelected = row.registrationNumber === lookupQuery;
                 return (
                   <tr
@@ -131,34 +133,41 @@ export function SelectionRecapSection() {
                     onClick={() => {
                       dispatch(setLookupQuery(row.registrationNumber));
                       dispatch(setLookupTrack('ALL'));
-                      dispatch(runSelectionLookup());
+                      dispatch(
+                        fetchPublicSelectionResults({
+                          highlight: row.registrationNumber,
+                          q: recapSearch,
+                          track: 'ALL',
+                          tab: recapTab,
+                          page: recapPage,
+                          pageSize,
+                        }),
+                      );
                     }}
-                    className={`cursor-pointer transition-colors hover:bg-blue-50/40 ${
-                      isSelected ? 'bg-blue-50/70' : ''
+                    className={`cursor-pointer transition-colors hover:bg-[#f8f9fa] ${
+                      isSelected ? 'bg-[#cfe2ff]/35' : ''
                     }`}
                   >
-                    <td className="px-4 py-3 font-bold text-slate-600 tabular-nums">
+                    <td className="px-4 py-3 font-semibold text-[#6c757d] tabular-nums">
                       {String(row.rank).padStart(2, '0')}
                     </td>
-                    <td className="px-4 py-3 font-bold text-[#163b8c] tabular-nums">
+                    <td className="px-4 py-3 font-semibold text-[#0d6efd] whitespace-nowrap tabular-nums">
                       {row.registrationNumber}
                     </td>
-                    <td className="px-4 py-3 font-bold text-slate-900">
+                    <td className="px-4 py-3 font-semibold text-[#212529]">
                       {row.fullName}
                       {isSelected && (
-                        <span className="ml-2 text-[10px] font-semibold text-blue-700">
-                          (Sedang Ditinjau)
-                        </span>
+                        <span className="ml-2 text-xs font-medium text-[#0d6efd]">(Terpilih)</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-slate-600">{row.previousSchool}</td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 text-[#495057]">{row.previousSchool}</td>
+                    <td className="px-4 py-3 whitespace-nowrap">
                       <Badge tone="blue">{row.trackLabel}</Badge>
                     </td>
-                    <td className="px-4 py-3 font-extrabold text-slate-900 tabular-nums">
+                    <td className="px-4 py-3 font-bold text-[#212529] tabular-nums">
                       {row.finalScore.toFixed(2)}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 whitespace-nowrap">
                       <Badge
                         tone={
                           row.status === 'LULUS UTAMA'
@@ -171,15 +180,15 @@ export function SelectionRecapSection() {
                         {row.status}
                       </Badge>
                     </td>
-                    <td className="px-4 py-3 text-slate-600">{row.originArea}</td>
+                    <td className="px-4 py-3 text-[#495057]">{row.originArea}</td>
                   </tr>
                 );
               })}
 
-              {paged.length === 0 && (
+              {recapItems.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-4 py-8 text-center text-slate-500">
-                    Tidak ada peserta sesuai kata kunci pencarian.
+                  <td colSpan={8} className="px-4 py-8 text-center text-[#6c757d]">
+                    Tidak ada peserta sesuai kriteria pencarian.
                   </td>
                 </tr>
               )}
@@ -188,7 +197,7 @@ export function SelectionRecapSection() {
         </div>
 
         <PaginationBar
-          totalItems={filtered.length}
+          totalItems={recapTotalItems}
           pageSize={pageSize}
           currentPage={recapPage}
           onPageChange={(page) => dispatch(setRecapPage(page))}
@@ -197,4 +206,3 @@ export function SelectionRecapSection() {
     </section>
   );
 }
-

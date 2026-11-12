@@ -28,7 +28,8 @@ export function LoginFormPanel() {
   }
 
   return (
-    <Card padding="lg" className="shadow-xl shadow-slate-900/5 border-slate-200">
+    <Card padding="lg" className="h-full flex flex-col justify-between shadow-sm border-[#dee2e6]">
+      <div>
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <Badge tone="blue" icon={<ShieldCheck className="h-3.5 w-3.5" />}>
           Otorisasi Otomatis RBAC
@@ -139,11 +140,12 @@ export function LoginFormPanel() {
         </Button>
       </form>
 
-      <div className="relative my-6 flex items-center justify-center">
-        <div className="w-full border-t border-slate-200" />
-        <span className="bg-white px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 whitespace-nowrap">
-          ATAU MASUK DENGAN METODE INSTAN
+      <div className="my-6 flex items-center gap-3">
+        <div className="flex-1 border-t border-[#dee2e6]" />
+        <span className="text-xs font-semibold uppercase tracking-wide text-[#6c757d] whitespace-nowrap">
+          Atau masuk dengan metode instan
         </span>
+        <div className="flex-1 border-t border-[#dee2e6]" />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -175,7 +177,7 @@ export function LoginFormPanel() {
       <div className="mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-t border-slate-100 pt-4 text-xs text-slate-600">
         <div>
           Belum punya akun?{' '}
-          <Link to="/ppdb" className="font-bold text-[#163b8c] hover:underline">
+          <Link to="/ppdb" className="font-bold text-[#0d6efd] hover:underline">
             Daftar E-PPDB 2026/2027 →
           </Link>
         </div>
@@ -183,6 +185,7 @@ export function LoginFormPanel() {
           <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
           <span>ISO 27001 Certified System</span>
         </div>
+      </div>
       </div>
     </Card>
   );

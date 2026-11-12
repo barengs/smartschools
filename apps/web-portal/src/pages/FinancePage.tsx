@@ -65,7 +65,7 @@ export function FinancePage() {
       </div>
 
       {/* Tab strip */}
-      <div className="flex flex-wrap items-center gap-1.5 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-2xs">
+      <div className="flex flex-wrap items-center gap-1.5 rounded border border-slate-200 bg-white p-1.5 shadow-2xs">
         {(
           [
             { key: 'BILLING', label: 'Billing SPP, Beasiswa & Dunning' },
@@ -78,7 +78,7 @@ export function FinancePage() {
             key={t.key}
             type="button"
             onClick={() => setTab(t.key)}
-            className={`rounded-xl px-3.5 py-2 text-xs font-bold transition-colors cursor-pointer ${
+            className={`rounded px-3.5 py-2 text-xs font-bold transition-colors cursor-pointer ${
               tab === t.key
                 ? 'bg-[#163b8c] text-white shadow-xs'
                 : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
@@ -199,7 +199,7 @@ export function FinancePage() {
             <p className="text-xs text-slate-600">
               Setiap invoice <code>PAID</code>, pencairan SPJ BOS, top-up dompet, &amp; penyusutan aset sarpras membangkitkan entri Debit/Kredit otomatis.
             </p>
-            <div className="rounded-xl border border-slate-200 p-3 text-xs space-y-1">
+            <div className="rounded border border-slate-200 p-3 text-xs space-y-1">
               <div className="flex justify-between font-bold"><span>1101 · Kas Bank BNI Operasional (Debit)</span><span className="tabular-nums">Rp 454.515.000</span></div>
               <div className="flex justify-between text-slate-600"><span>4101 · Pendapatan SPP &amp; Pendidikan (Kredit)</span><span className="tabular-nums">Rp 454.515.000</span></div>
             </div>
@@ -213,7 +213,7 @@ export function FinancePage() {
             <p className="text-xs text-slate-600">
               Kalkulasi gaji pokok, tunjangan wali kelas, honor mengajar dari <code>teaching_journals</code>, serta potongan BPJS &amp; PPh 21.
             </p>
-            <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-3 text-xs flex justify-between items-center">
+            <div className="rounded border border-emerald-200 bg-emerald-50/70 p-3 text-xs flex justify-between items-center">
               <span className="font-bold text-emerald-900">Periode November 2026 (68 GTK)</span>
               <Badge tone="emerald">Siap Transfer &amp; Slip PDF</Badge>
             </div>

@@ -8,6 +8,7 @@ interface AchievementCardProps {
   quote: string;
   resultFooter: string;
   initials: string;
+  imageUrl?: string;
   accentTone?: 'blue' | 'emerald';
 }
 
@@ -18,34 +19,41 @@ export function AchievementCard({
   quote,
   resultFooter,
   initials,
+  imageUrl,
   accentTone = 'blue',
 }: AchievementCardProps) {
   return (
     <Card padding="md" className="flex flex-col sm:flex-row gap-4 items-start">
-      <div
-        className={`flex h-24 w-full sm:w-28 shrink-0 items-center justify-center rounded-xl border font-extrabold text-2xl ${
-          accentTone === 'emerald'
-            ? 'bg-gradient-to-br from-emerald-900 to-teal-700 text-white border-emerald-800'
-            : 'bg-gradient-to-br from-[#0f2b6b] to-blue-600 text-white border-blue-900'
-        }`}
-      >
-        <div className="flex flex-col items-center gap-1">
-          <Trophy className="h-5 w-5 text-amber-300" />
-          <span className="text-sm tracking-wider">{initials}</span>
+      {imageUrl ? (
+        <img
+          src={imageUrl}
+          alt={studentName}
+          className="h-44 sm:h-32 w-full sm:w-40 shrink-0 rounded-md border border-[#dee2e6] object-cover"
+        />
+      ) : (
+        <div
+          className={`flex h-32 w-full sm:w-36 shrink-0 items-center justify-center rounded-md border font-bold text-xl ${
+            accentTone === 'emerald'
+              ? 'bg-[#198754] text-white border-[#146c43]'
+              : 'bg-[#0d6efd] text-white border-[#0a58ca]'
+          }`}
+        >
+          <div className="flex flex-col items-center gap-1">
+            <Trophy className="h-5 w-5 text-amber-300" />
+            <span className="text-sm">{initials}</span>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <Badge tone={accentTone === 'emerald' ? 'emerald' : 'blue'} uppercase>
-            {levelLabel}
-          </Badge>
-          <span className="text-[11px] font-semibold text-slate-500">{year}</span>
+          <Badge tone={accentTone === 'emerald' ? 'emerald' : 'blue'}>{levelLabel}</Badge>
+          <span className="text-sm font-medium text-[#6c757d]">{year}</span>
         </div>
-        <h3 className="mt-2 text-base font-extrabold text-slate-900">{studentName}</h3>
-        <p className="mt-1.5 text-xs leading-relaxed text-slate-600 italic">&ldquo;{quote}&rdquo;</p>
-        <div className="mt-3 flex items-center gap-1.5 text-[11px] font-bold text-[#163b8c]">
-          <Trophy className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+        <h3 className="mt-2 text-lg font-bold text-[#212529]">{studentName}</h3>
+        <p className="mt-1.5 text-[15px] leading-relaxed text-[#495057]">&ldquo;{quote}&rdquo;</p>
+        <div className="mt-3 flex items-center gap-2 text-sm font-semibold text-[#0a58ca]">
+          <Trophy className="h-4 w-4 text-amber-500 shrink-0" />
           <span>{resultFooter}</span>
         </div>
       </div>
@@ -67,25 +75,24 @@ export function TestimonialCard({
   initials,
 }: TestimonialCardProps) {
   return (
-    <Card padding="md" className="flex flex-col justify-between h-full">
+    <Card padding="md" className="flex flex-col justify-between border-l-4 border-l-[#0d6efd]">
       <div>
-        <div className="flex items-center gap-0.5 text-amber-400 mb-3">
+        <div className="flex items-center gap-1 text-amber-400 mb-3">
           {Array.from({ length: 5 }).map((_, idx) => (
             <Star key={idx} className="h-4 w-4 fill-amber-400" />
           ))}
         </div>
-        <p className="text-xs sm:text-sm leading-relaxed text-slate-700 italic">&ldquo;{quote}&rdquo;</p>
+        <p className="text-base leading-relaxed text-[#212529]">&ldquo;{quote}&rdquo;</p>
       </div>
-      <div className="mt-4 flex items-center gap-3 border-t border-slate-100 pt-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 text-xs font-extrabold text-[#163b8c] border border-blue-200">
+      <div className="mt-4 flex items-center gap-3 border-t border-[#dee2e6] pt-3">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#cfe2ff] text-sm font-bold text-[#052c65]">
           {initials}
         </div>
         <div>
-          <div className="text-xs font-bold text-slate-900">{authorName}</div>
-          <div className="text-[11px] text-slate-500">{authorRole}</div>
+          <div className="text-sm font-bold text-[#212529]">{authorName}</div>
+          <div className="text-xs text-[#6c757d]">{authorRole}</div>
         </div>
       </div>
     </Card>
   );
 }
-

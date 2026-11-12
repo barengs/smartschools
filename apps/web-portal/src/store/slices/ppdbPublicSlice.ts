@@ -68,6 +68,60 @@ export interface SelectionCandidateRecord {
   notes: string;
 }
 
+export interface PublicTrackOverview {
+  code: AdmissionTrack;
+  title: string;
+  quotaPercent: number;
+  capacity: number;
+  registered: number;
+  accepted: number;
+  description: string;
+  requirements: Array<{ label: string; value: string }>;
+  ctaLabel: string;
+  recommended?: boolean;
+}
+
+export interface PublicOverviewData {
+  schoolName: string;
+  npsn: string;
+  accreditation: string;
+  wave: {
+    title: string;
+    periodName: string;
+    closingDateLabel: string;
+    deadlineIso: string;
+    totalQuota: number;
+    totalRegistered: number;
+    remainingSeats: number;
+  };
+  metrics: {
+    accreditation: string;
+    alumniUniversityRate: string;
+    activeStudents: number;
+    totalRegisteredPpdb: number;
+    serviceUptime: string;
+  };
+  tracks: PublicTrackOverview[];
+  feeSchedule: Array<{
+    component: string;
+    nominal: string;
+    notes: string;
+  }>;
+}
+
+export interface PublicSelectionResultsResponse {
+  totalRegistered: number;
+  totalAccepted: number;
+  totalWaitlist: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  totalItems: number;
+  items: SelectionCandidateRecord[];
+  highlightedRecord: SelectionCandidateRecord | null;
+  trackRecap: Array<{ code: string; acceptedCount: number; totalCount: number }>;
+}
+
 export interface PpdbPublicState {
   currentStep: number;
   draft: PpdbDraftForm;
@@ -77,13 +131,23 @@ export interface PpdbPublicState {
   submitting: boolean;
   submitError: string | null;
   submitResult: PpdbRegisterResponse | null;
+  overview: PublicOverviewData | null;
+  overviewLoading: boolean;
+  feeModalOpen: boolean;
   lookupQuery: string;
   lookupTrack: string;
   lookupResult: SelectionCandidateRecord | null;
   lookupSearched: boolean;
+  resultsLoading: boolean;
   recapTab: 'ACCEPTED' | 'WAITLIST';
   recapSearch: string;
   recapPage: number;
+  recapItems: SelectionCandidateRecord[];
+  recapTotalAccepted: number;
+  recapTotalWaitlist: number;
+  recapTotalPages: number;
+  recapTotalItems: number;
+  trackRecap: Array<{ code: string; acceptedCount: number; totalCount: number }>;
 }
 
 export const SCHOOL_GATE_COORDS = {
@@ -208,36 +272,33 @@ export const SELECTION_CANDIDATE_DIRECTORY: SelectionCandidateRecord[] = [
   },
 ];
 
-const INITIAL_LAT = '-6.602148';
-const INITIAL_LNG = '106.814321';
-
 const initialState: PpdbPublicState = {
-  currentStep: 2,
+  currentStep: 1,
   draft: {
-    fullName: 'Aisyah Azzahra Putri',
+    fullName: '',
     username: '',
     password: '',
     email: '',
-    nisn: '0098127364',
-    nik: '3271045509100003',
-    gender: 'FEMALE',
+    nisn: '',
+    nik: '',
+    gender: 'MALE',
     admissionTrack: 'ZONASI',
     primarySchool: 'SMA Nusantara Unggul (NPSN: 20108923) — Rutin',
-    secondarySchool: 'SMA Negeri 3 Kota Madya (NPSN: 20108840)',
-    latitude: INITIAL_LAT,
-    longitude: INITIAL_LNG,
-    streetAddress: 'Jl. Cempaka Putih Baru No. 14A, Blok B',
-    rt: '004',
-    rw: '009',
-    village: 'Babakan Madang',
-    district: 'Bogor Tengah',
-    city: 'Kota Bogor',
-    postalCode: '16128',
+    secondarySchool: '',
+    latitude: '',
+    longitude: '',
+    streetAddress: '',
+    rt: '',
+    rw: '',
+    village: '',
+    district: '',
+    city: '',
+    postalCode: '',
     housingStatus: 'OWN_PARENT',
-    previousSchoolNpsn: '20219482',
-    previousSchool: 'SMP Negeri 1 Unggulan Kota Bogor',
-    sklNumber: 'SKL-SMP1/2026/05/8921-A',
-    reportAverage: '91.45',
+    previousSchoolNpsn: '',
+    previousSchool: '',
+    sklNumber: '',
+    reportAverage: '',
     parentName: '',
     parentPhone: '',
     paymentMethod: 'VA_BNI',
@@ -246,46 +307,86 @@ const initialState: PpdbPublicState = {
     {
       code: 'KK',
       title: 'Kartu Keluarga (KK) Asli',
-      fileName: 'kk_aisyah.pdf (1.2 MB)',
-      status: 'UPLOADED',
+      fileName: 'Belum diunggah',
+      status: 'REQUIRED',
     },
     {
       code: 'AKTA',
       title: 'Akta Kelahiran Siswa',
-      fileName: 'akta_aisyah.pdf (844 KB)',
-      status: 'UPLOADED',
+      fileName: 'Belum diunggah',
+      status: 'REQUIRED',
     },
     {
       code: 'SKL',
       title: 'SKL / Legalisir Rapor SMP',
-      fileName: 'Perlu Unggah di Langkah 3 (Maks 2MB)',
+      fileName: 'Belum diunggah',
       status: 'REQUIRED',
     },
     {
       code: 'GEOTAG',
       title: 'Bukti Geotagging GPS',
-      fileName: 'Terverifikasi Otomatis via Peta',
-      status: 'VERIFIED',
+      fileName: 'Pilih titik lokasi di peta Mapbox',
+      status: 'REQUIRED',
     },
   ],
-  distanceMeters: calculateHaversineMeters(
-    Number(INITIAL_LAT),
-    Number(INITIAL_LNG),
-    SCHOOL_GATE_COORDS.lat,
-    SCHOOL_GATE_COORDS.lng,
-  ),
+  distanceMeters: 0,
   lastSavedAt: null,
   submitting: false,
   submitError: null,
   submitResult: null,
-  lookupQuery: 'PPDB-2026-0481',
-  lookupTrack: 'ZONASI',
+  overview: null,
+  overviewLoading: false,
+  feeModalOpen: false,
+  lookupQuery: 'PPDB-2026-0191',
+  lookupTrack: 'ALL',
   lookupResult: SELECTION_CANDIDATE_DIRECTORY[2],
   lookupSearched: true,
+  resultsLoading: false,
   recapTab: 'ACCEPTED',
   recapSearch: '',
   recapPage: 1,
+  recapItems: SELECTION_CANDIDATE_DIRECTORY.filter((item) => item.status === 'LULUS UTAMA'),
+  recapTotalAccepted: 4,
+  recapTotalWaitlist: 2,
+  recapTotalPages: 1,
+  recapTotalItems: 4,
+  trackRecap: [],
 };
+
+export const fetchPublicOverview = createAsyncThunk<
+  PublicOverviewData,
+  void,
+  { rejectValue: string }
+>('ppdbPublic/fetchOverview', async (_, { rejectWithValue }) => {
+  try {
+    return await apiRequest<PublicOverviewData>('/api/v1/core/ppdb/public/overview', {}, false);
+  } catch (err) {
+    return rejectWithValue((err as ApiError).message ?? 'Gagal memuat ringkasan PPDB');
+  }
+});
+
+export const fetchPublicSelectionResults = createAsyncThunk<
+  PublicSelectionResultsResponse,
+  { q?: string; highlight?: string; track?: string; tab?: 'ACCEPTED' | 'WAITLIST'; page?: number; pageSize?: number },
+  { rejectValue: string }
+>('ppdbPublic/fetchResults', async (params, { rejectWithValue }) => {
+  try {
+    const query = new URLSearchParams();
+    if (params.q?.trim()) query.set('q', params.q.trim());
+    if (params.highlight?.trim()) query.set('highlight', params.highlight.trim());
+    if (params.track && params.track !== 'ALL') query.set('track', params.track);
+    query.set('tab', params.tab ?? 'ACCEPTED');
+    query.set('page', String(params.page ?? 1));
+    query.set('pageSize', String(params.pageSize ?? 6));
+    return await apiRequest<PublicSelectionResultsResponse>(
+      `/api/v1/core/ppdb/public/results?${query.toString()}`,
+      {},
+      false,
+    );
+  } catch (err) {
+    return rejectWithValue((err as ApiError).message ?? 'Gagal memuat hasil seleksi PPDB');
+  }
+});
 
 export const submitPpdbRegistration = createAsyncThunk<
   PpdbRegisterResponse,
@@ -333,13 +434,20 @@ const ppdbPublicSlice = createSlice({
       if (action.payload.key === 'latitude' || action.payload.key === 'longitude') {
         const lat = Number(state.draft.latitude);
         const lng = Number(state.draft.longitude);
-        if (Number.isFinite(lat) && Number.isFinite(lng)) {
+        if (state.draft.latitude.trim() && state.draft.longitude.trim() && Number.isFinite(lat) && Number.isFinite(lng)) {
           state.distanceMeters = calculateHaversineMeters(
             lat,
             lng,
             SCHOOL_GATE_COORDS.lat,
             SCHOOL_GATE_COORDS.lng,
           );
+          const geoDoc = state.checklist.find((item) => item.code === 'GEOTAG');
+          if (geoDoc) {
+            geoDoc.status = 'VERIFIED';
+            geoDoc.fileName = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+          }
+        } else {
+          state.distanceMeters = 0;
         }
       }
     },
@@ -397,9 +505,39 @@ const ppdbPublicSlice = createSlice({
     setRecapPage(state, action: PayloadAction<number>) {
       state.recapPage = action.payload;
     },
+    setFeeModalOpen(state, action: PayloadAction<boolean>) {
+      state.feeModalOpen = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
+      .addCase(fetchPublicOverview.pending, (state) => {
+        state.overviewLoading = true;
+      })
+      .addCase(fetchPublicOverview.fulfilled, (state, action) => {
+        state.overviewLoading = false;
+        state.overview = action.payload;
+      })
+      .addCase(fetchPublicOverview.rejected, (state) => {
+        state.overviewLoading = false;
+      })
+      .addCase(fetchPublicSelectionResults.pending, (state) => {
+        state.resultsLoading = true;
+      })
+      .addCase(fetchPublicSelectionResults.fulfilled, (state, action) => {
+        state.resultsLoading = false;
+        state.lookupSearched = true;
+        state.lookupResult = action.payload.highlightedRecord;
+        state.recapItems = action.payload.items;
+        state.recapTotalAccepted = action.payload.totalAccepted;
+        state.recapTotalWaitlist = action.payload.totalWaitlist;
+        state.recapTotalPages = action.payload.totalPages;
+        state.recapTotalItems = action.payload.totalItems;
+        state.trackRecap = action.payload.trackRecap;
+      })
+      .addCase(fetchPublicSelectionResults.rejected, (state) => {
+        state.resultsLoading = false;
+      })
       .addCase(submitPpdbRegistration.pending, (state) => {
         state.submitting = true;
         state.submitError = null;
@@ -429,6 +567,7 @@ export const {
   setRecapTab,
   setRecapSearch,
   setRecapPage,
+  setFeeModalOpen,
 } = ppdbPublicSlice.actions;
 
 export default ppdbPublicSlice.reducer;

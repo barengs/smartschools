@@ -59,7 +59,7 @@ export function SchedulePage() {
                   <h3 className="text-base font-extrabold text-slate-900">Matriks Jadwal Kelas XI MIPA 1</h3>
                   <Badge tone="blue">Drag &amp; Drop Anti-Bentrok</Badge>
                 </div>
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                <div className="overflow-x-auto rounded border border-slate-200">
                   <table className="w-full text-left border-collapse text-xs">
                     <thead>
                       <tr className="border-b border-slate-200 bg-slate-50 text-[10px] font-extrabold uppercase text-slate-500">
@@ -99,7 +99,7 @@ export function SchedulePage() {
                   { classRoom: 'X-IPS-2', absent: 'Dra. Sri Lestari (Cuti)', sub: 'Rina Kusuma, S.Pd (Terisi)', status: 'TERGANTIKAN' },
                   { classRoom: 'XII-IPA-3', absent: 'Budi Santoso, M.Pd (Dinas)', sub: 'Drs. Bambang Sudarmono (Piket Siaga)', status: 'SIAGA' },
                 ].map((p) => (
-                  <div key={p.classRoom} className="flex items-center justify-between rounded-xl border border-slate-200 p-3.5">
+                  <div key={p.classRoom} className="flex items-center justify-between rounded border border-slate-200 p-3.5">
                     <div>
                       <div className="font-extrabold text-slate-900">{p.classRoom} · {p.absent}</div>
                       <div className="text-slate-600 mt-0.5">Pengganti: <strong>{p.sub}</strong></div>

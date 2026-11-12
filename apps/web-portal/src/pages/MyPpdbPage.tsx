@@ -137,7 +137,7 @@ export function MyPpdbPage() {
                 <input
                   type="file"
                   onChange={handleFileUpload}
-                  className="block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-700 file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-[#163b8c]"
+                  className="block w-full rounded border border-slate-300 bg-white px-3 py-2 text-xs text-slate-700 file:mr-3 file:rounded file:border-0 file:bg-blue-50 file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-[#163b8c]"
                 />
               </FormField>
             </div>
@@ -151,7 +151,7 @@ export function MyPpdbPage() {
               {app.documents_jsonb.map((d) => (
                 <div
                   key={d.objectKey}
-                  className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs"
+                  className="flex items-center gap-2.5 rounded border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs"
                 >
                   <FileCheck2 className="h-4 w-4 text-emerald-600 shrink-0" />
                   <div className="min-w-0">

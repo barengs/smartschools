@@ -10,17 +10,17 @@ interface CardProps {
 }
 
 const VARIANT_MAP: Record<CardVariant, string> = {
-  default: 'bg-white border border-slate-200/90 shadow-xs',
-  navy: 'bg-gradient-to-br from-[#0f2b6b] via-[#13347d] to-[#163b8c] text-white border border-blue-900/40 shadow-lg shadow-blue-950/15',
-  tinted: 'bg-blue-50/60 border border-blue-100',
-  highlight: 'bg-white border-2 border-[#163b8c] shadow-md shadow-blue-900/10',
+  default: 'bg-white border border-[#dee2e6] shadow-2xs',
+  navy: 'bg-[#0a58ca] text-white border border-[#084298] shadow-sm',
+  tinted: 'bg-[#cfe2ff]/35 border border-[#b6d4fe]',
+  highlight: 'bg-white border-2 border-[#0d6efd] shadow-sm',
 };
 
 const PAD_MAP = {
   none: '',
-  sm: 'p-4',
-  md: 'p-5 sm:p-6',
-  lg: 'p-6 sm:p-8',
+  sm: 'p-3.5 sm:p-4',
+  md: 'p-4 sm:p-5',
+  lg: 'p-5 sm:p-6',
 };
 
 export function Card({
@@ -30,7 +30,7 @@ export function Card({
   className = '',
 }: CardProps) {
   return (
-    <div className={`rounded-2xl ${VARIANT_MAP[variant]} ${PAD_MAP[padding]} ${className}`}>
+    <div className={`min-w-0 rounded ${VARIANT_MAP[variant]} ${PAD_MAP[padding]} ${className}`}>
       {children}
     </div>
   );

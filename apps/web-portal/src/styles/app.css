@@ -1,22 +1,56 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --color-brand-950: #0a1f4d;
-  --color-brand-900: #0f2b6b;
-  --color-brand-800: #163b8c;
-  --color-brand-700: #1d4ed8;
-  --color-brand-600: #2563eb;
-  --color-brand-50: #eff4ff;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Plus Jakarta Sans", Arial, sans-serif;
+  --color-bs-primary: #0d6efd;
+  --color-bs-primary-dark: #0a58ca;
+  --color-bs-secondary: #6c757d;
+  --color-bs-success: #198754;
+  --color-bs-info: #0dcaf0;
+  --color-bs-warning: #ffc107;
+  --color-bs-danger: #dc3545;
+  --color-bs-light: #f8f9fa;
+  --color-bs-dark: #212529;
+  --color-bs-border: #dee2e6;
 }
 
 @layer base {
   html {
     font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.5;
     scroll-behavior: smooth;
+    color: #212529;
   }
 
   .tabular-nums {
     font-variant-numeric: tabular-nums;
+  }
+}
+
+.bs-container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 576px) {
+  .bs-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1400px) {
+  .bs-container {
+    max-width: 1320px;
+  }
+}
+
+@media (min-width: 1200px) and (max-width: 1399.98px) {
+  .bs-container {
+    max-width: 1180px;
   }
 }

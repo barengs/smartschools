@@ -6,50 +6,50 @@ import { StepCard } from '../molecules';
 const PPDB_STEPS = [
   {
     stepNumber: 1,
-    title: 'Buat Akun & Isi Formulir',
+    title: 'Registrasi Akun & Biodata',
     description:
-      'Registrasi akun SSO menggunakan NIK dan NISN aktif, lengkapi biodata calon siswa, serta pilih jalur seleksi.',
+      'Buat akun calon siswa memakai NIK dan NISN aktif, lengkapi data pribadi serta pilih jalur pendaftaran.',
   },
   {
     stepNumber: 2,
-    title: 'Unggah Berkas & Geotag',
+    title: 'Unggah Berkas & Geotagging',
     description:
-      'Upload scan KK, Akta, Rapor, & tandai titik pin rumah untuk kalkulasi jarak Haversine secara otomatis.',
+      'Unggah pindaian Kartu Keluarga, Akta Lahir, rapor, dan tentukan koordinat rumah di peta.',
   },
   {
     stepNumber: 3,
-    title: 'Verifikasi Dokumen Panitia',
+    title: 'Verifikasi Panitia PPDB',
     description:
-      'Pemeriksaan validitas berkas oleh panitia secara desk split-view; revisi berkas diunggah ulang tanpa daftar ulang.',
+      'Tim verifikator memeriksa kelengkapan dokumen secara daring. Jika ada kekurangan, revisi dikirim melalui portal.',
   },
   {
     stepNumber: 4,
-    title: 'CBT Placement Test',
+    title: 'Tes Penempatan (CBT)',
     description:
-      'Pelaksanaan tes diagnostik literasi, numerasi, dan penjurusan dalam mesin ujian anti-kecurangan Rust CBT.',
+      'Peserta mengikuti asesmen literasi dan numerasi terjadwal sebagai bagian dari pemetaan kelas.',
   },
   {
     stepNumber: 5,
-    title: 'Hasil & Daftar Ulang',
+    title: 'Pengumuman & Daftar Ulang',
     description:
-      'Pengumuman kelulusan, pembayaran daftar ulang VA/QRIS, & One-Click Migration ke Buku Induk siswa aktif.',
+      'Cek kelulusan melalui portal, selesaikan administrasi VA/QRIS, dan data otomatis masuk ke Buku Induk.',
   },
 ];
 
 export function StepsSection() {
   return (
-    <section className="py-16 bg-white border-y border-slate-100">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section className="py-12 bg-[#f8f9fa] border-b border-[#dee2e6]">
+      <div className="bs-container">
         <SectionHeading
-          kicker="LANGKAH MUDAH & TRANSPARAN"
+          kicker="Tahapan Seleksi"
           title="Alur 5 Langkah Pendaftaran E-PPDB"
-          subtitle="Seluruh tahapan seleksi dipantau secara real-time melalui Dashboard Calon Siswa tanpa tatap muka langsung."
+          subtitle="Seluruh proses pendaftaran dilakukan secara daring dan dapat dipantau secara langsung."
           rightSlot={
             <Link
               to="/status-seleksi"
-              className="inline-flex items-center gap-1 text-xs font-extrabold text-[#163b8c] hover:underline"
+              className="inline-flex items-center gap-1 text-sm font-semibold text-[#0d6efd] hover:underline"
             >
-              <span>Pantau Status Seleksi</span>
+              <span>Pantau Status Berkas</span>
               <ArrowUpRight className="h-4 w-4" />
             </Link>
           }
@@ -69,4 +69,3 @@ export function StepsSection() {
     </section>
   );
 }
-

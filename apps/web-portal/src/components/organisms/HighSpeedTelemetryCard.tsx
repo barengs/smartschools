@@ -6,7 +6,7 @@ export function HighSpeedTelemetryCard() {
     <Card padding="md" className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-[#163b8c]">
+          <div className="flex h-8 w-8 items-center justify-center rounded bg-blue-50 text-[#163b8c]">
             <Activity className="h-4 w-4" />
           </div>
           <div>
@@ -22,7 +22,7 @@ export function HighSpeedTelemetryCard() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-4">
+        <div className="rounded border border-slate-200 bg-slate-50/60 p-4">
           <div className="flex items-center justify-between text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
             <span>LATENSI RFID GERBANG</span>
             <Cpu className="h-3.5 w-3.5 text-[#163b8c]" />
@@ -36,7 +36,7 @@ export function HighSpeedTelemetryCard() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-4">
+        <div className="rounded border border-slate-200 bg-slate-50/60 p-4">
           <div className="flex items-center justify-between text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
             <span>CBT LIVE SESSIONS</span>
             <MonitorPlay className="h-3.5 w-3.5 text-[#163b8c]" />
@@ -53,7 +53,7 @@ export function HighSpeedTelemetryCard() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-4">
+        <div className="rounded border border-slate-200 bg-slate-50/60 p-4">
           <div className="flex items-center justify-between text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
             <span>POS KANTIN CASHLESS</span>
             <CreditCard className="h-3.5 w-3.5 text-emerald-600" />

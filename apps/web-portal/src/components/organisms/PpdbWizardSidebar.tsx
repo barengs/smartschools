@@ -10,7 +10,7 @@ interface PpdbWizardSidebarProps {
 
 export function PpdbWizardSidebar({ onFinalSubmit }: PpdbWizardSidebarProps) {
   const dispatch = useAppDispatch();
-  const { currentStep, draft, checklist, submitting, lastSavedAt } = useAppSelector(
+  const { currentStep, draft, checklist, submitting, lastSavedAt, submitResult } = useAppSelector(
     (s) => s.ppdbPublic,
   );
 
@@ -22,26 +22,31 @@ export function PpdbWizardSidebar({ onFinalSubmit }: PpdbWizardSidebarProps) {
     .join('');
 
   const completedCount = checklist.filter((c) => c.status !== 'REQUIRED').length;
+  const hasIdentity = Boolean(draft.fullName.trim() && draft.username.trim());
 
   return (
     <div className="space-y-4 lg:sticky lg:top-20">
       {/* Applicant Profile Summary Card */}
       <Card padding="md">
         <div className="flex items-start gap-3">
-          <div className="flex h-14 w-12 shrink-0 flex-col items-center justify-center rounded-xl bg-gradient-to-br from-[#0f2b6b] to-blue-600 text-white font-extrabold text-sm shadow-xs">
+          <div className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded bg-[#0d6efd] text-white font-bold text-sm">
             <span>{initials || 'CS'}</span>
           </div>
           <div className="min-w-0 flex-1">
-            <Badge tone="blue" className="tabular-nums">
-              PPDB-2026-0481
+            <Badge tone={submitResult ? 'emerald' : 'slate'} className="tabular-nums">
+              {submitResult ? submitResult.registrationNumber : 'Draf Baru'}
             </Badge>
-            <h3 className="mt-1 text-base font-extrabold text-slate-900 truncate">
+            <h3 className="mt-1 text-base font-bold text-[#212529] truncate">
               {draft.fullName || 'Calon Peserta Didik'}
             </h3>
-            <p className="text-[11px] text-slate-500">Calon Peserta Didik Baru</p>
-            <div className="mt-1 inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700">
+            <p className="text-xs text-[#6c757d]">Calon Peserta Didik Baru</p>
+            <div
+              className={`mt-1 inline-flex items-center gap-1 text-xs font-semibold ${
+                hasIdentity ? 'text-[#198754]' : 'text-[#6c757d]'
+              }`}
+            >
               <CheckCircle2 className="h-3.5 w-3.5" />
-              <span>Data Diri Terkonfirmasi</span>
+              <span>{hasIdentity ? 'Data Diri Terisi' : 'Menunggu pengisian data'}</span>
             </div>
           </div>
         </div>
@@ -61,7 +66,7 @@ export function PpdbWizardSidebar({ onFinalSubmit }: PpdbWizardSidebarProps) {
           </div>
         </div>
 
-        <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-900">
+        <div className="mt-4 rounded border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-900">
           <div className="flex items-center gap-1.5 font-extrabold">
             <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0" />
             <span>Duplicate Guard Aktif</span>

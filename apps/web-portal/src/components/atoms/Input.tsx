@@ -15,17 +15,17 @@ export function Input({
 }: InputProps) {
   return (
     <div
-      className={`flex items-center rounded-xl border bg-white transition-colors focus-within:ring-2 ${
+      className={`flex items-center rounded border bg-white transition-colors focus-within:ring-2 ${
         hasError
-          ? 'border-rose-300 focus-within:border-rose-500 focus-within:ring-rose-100'
-          : 'border-slate-300 focus-within:border-blue-600 focus-within:ring-blue-100'
+          ? 'border-[#dc3545] focus-within:border-[#dc3545] focus-within:ring-[#dc3545]/25'
+          : 'border-[#ced4da] focus-within:border-[#86b7fe] focus-within:ring-[#0d6efd]/25'
       }`}
     >
       {leftIcon && (
-        <span className="pl-3.5 text-slate-400 flex items-center shrink-0">{leftIcon}</span>
+        <span className="pl-3 text-[#6c757d] flex items-center shrink-0">{leftIcon}</span>
       )}
       <input
-        className={`w-full bg-transparent px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-slate-50 ${className}`}
+        className={`w-full bg-transparent px-3 py-2 text-base text-[#212529] placeholder:text-[#6c757d] focus:outline-none disabled:cursor-not-allowed disabled:bg-[#e9ecef] ${className}`}
         {...rest}
       />
       {rightSlot && <span className="pr-3 flex items-center shrink-0">{rightSlot}</span>}

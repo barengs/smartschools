@@ -7,7 +7,7 @@ export function LoginBrandPanel() {
     <Card
       variant="navy"
       padding="lg"
-      className="flex flex-col justify-between min-h-[540px] lg:min-h-[620px]"
+      className="h-full flex flex-col justify-between"
     >
       <div>
         <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -18,11 +18,11 @@ export function LoginBrandPanel() {
           </span>
         </div>
 
-        <div className="mt-8">
+        <div className="mt-6">
           <span className="inline-block rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-blue-100">
             UNIFIED IDENTITY PLATFORM
           </span>
-          <h1 className="mt-4 text-2xl sm:text-3xl font-extrabold tracking-tight text-white leading-tight">
+          <h1 className="mt-3 text-xl sm:text-2xl font-extrabold tracking-tight text-white leading-tight">
             Pintu Masuk Terpadu Ekosistem Digital Smart School
           </h1>
           <p className="mt-3 text-xs sm:text-sm leading-relaxed text-blue-100/90">

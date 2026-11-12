@@ -50,7 +50,7 @@ export function PosKantinPage() {
             content: (
               <div className="space-y-3 text-xs">
                 <h3 className="text-base font-extrabold text-slate-900">Arus Buku Besar `wallet_transactions` (Service B Rust)</h3>
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                <div className="overflow-x-auto rounded border border-slate-200">
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="border-b border-slate-200 bg-slate-50 text-[10px] font-extrabold uppercase text-slate-500">

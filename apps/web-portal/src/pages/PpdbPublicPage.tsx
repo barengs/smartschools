@@ -33,7 +33,7 @@ export function PpdbPublicPage() {
       footerBanner={
         <Card padding="md" className="bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-900 text-white">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-slate-900 text-white">
               <MessageSquare className="h-5 w-5" />
             </div>
             <div>
@@ -51,7 +51,7 @@ export function PpdbPublicPage() {
               href="https://wa.me/6281123456789"
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 px-4 py-2 text-xs font-bold text-white transition-colors"
+              className="inline-flex items-center gap-2 rounded bg-emerald-600 hover:bg-emerald-700 px-4 py-2 text-xs font-bold text-white transition-colors"
             >
               <MessageSquare className="h-3.5 w-3.5" />
               <span>WhatsApp Verifikator PPDB</span>

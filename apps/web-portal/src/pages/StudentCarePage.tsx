@@ -36,7 +36,7 @@ export function StudentCarePage() {
                   { student: 'Bintang Pratama (XII IPS 1)', type: 'Pelanggaran Kedisiplinan', points: '+45 Poin Pelanggaran', action: 'Eskalasi Panggilan Orang Tua (SP1)', tone: 'rose' as const },
                   { student: 'Muhammad Farhan (XI MIPA 1)', type: 'Prestasi OSN Provinsi', points: '+45 Poin Prestasi', action: 'Tersinkron ke Transkrip & E-Rapor', tone: 'emerald' as const },
                 ].map((r) => (
-                  <div key={r.student} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-xl border border-slate-200 p-3.5">
+                  <div key={r.student} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded border border-slate-200 p-3.5">
                     <div>
                       <div className="font-extrabold text-slate-900">{r.student}</div>
                       <div className="text-slate-600 mt-0.5">{r.type} · Tindak lanjut: <strong>{r.action}</strong></div>

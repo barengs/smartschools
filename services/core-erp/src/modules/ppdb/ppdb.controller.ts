@@ -32,6 +32,30 @@ export class PpdbController {
     return this.ppdbService.register(dto);
   }
 
+  @Get('public/overview')
+  publicOverview() {
+    return this.ppdbService.getPublicOverview();
+  }
+
+  @Get('public/results')
+  publicResults(
+    @Query('q') q?: string,
+    @Query('highlight') highlight?: string,
+    @Query('track') track?: string,
+    @Query('tab') tab?: string,
+    @Query('page') page?: string,
+    @Query('pageSize') pageSize?: string,
+  ) {
+    return this.ppdbService.searchPublicResults({
+      q,
+      highlight,
+      track,
+      tab,
+      page: page ? Number(page) : 1,
+      pageSize: pageSize ? Number(pageSize) : 6,
+    });
+  }
+
   @Get('my')
   @UseGuards(JwtAuthGuard)
   myApplication(@CurrentUser() user: AuthenticatedUser) {

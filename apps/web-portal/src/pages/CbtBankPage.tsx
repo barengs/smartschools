@@ -54,7 +54,7 @@ export function CbtBankPage() {
                   { code: 'CBT-STS-FIS11', title: 'STS Ganjil Fisika Kelas XI', participants: '216 Siswa', lock: 'Exam Browser Lock', state: 'PRE-WARMED' },
                   { code: 'CBT-PPDB-2026', title: 'Placement Test E-PPDB Gelombang 1', participants: '420 Peserta', lock: 'QR Token + Acak Soal', state: 'AKTIF' },
                 ].map((ex) => (
-                  <div key={ex.code} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-xl border border-slate-200 p-3.5">
+                  <div key={ex.code} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded border border-slate-200 p-3.5">
                     <div>
                       <div className="font-extrabold text-slate-900">{ex.title}</div>
                       <div className="text-slate-500 mt-0.5">{ex.code} · {ex.participants} · {ex.lock}</div>

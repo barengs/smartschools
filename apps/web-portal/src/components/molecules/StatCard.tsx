@@ -35,7 +35,7 @@ export function StatCard({
         )}
       </div>
       <div
-        className={`mt-1.5 text-2xl font-extrabold tracking-tight tabular-nums ${
+        className={`mt-1 text-lg sm:text-xl font-extrabold tracking-tight tabular-nums ${
           isNavy ? 'text-white' : 'text-slate-900'
         }`}
       >

@@ -55,7 +55,7 @@ export function SarprasPage() {
                   { qr: 'QR-KIBB-2025-0118', name: 'AC Inverter 2 PK Ruang XI MIPA 1', source: 'Yayasan / Komite', pic: 'Teknisi Sarpras', cond: 'MINOR_DAMAGE' },
                   { qr: 'QR-KIBB-2024-0302', name: 'Proyektor Laser Aula Utama', source: 'BOS Reguler', pic: 'Staf Sarpras', cond: 'GOOD' },
                 ].map((a) => (
-                  <div key={a.qr} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-xl border border-slate-200 p-3.5">
+                  <div key={a.qr} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded border border-slate-200 p-3.5">
                     <div>
                       <div className="font-mono text-[11px] font-bold text-[#163b8c]">{a.qr}</div>
                       <div className="text-sm font-extrabold text-slate-900 mt-0.5">{a.name}</div>

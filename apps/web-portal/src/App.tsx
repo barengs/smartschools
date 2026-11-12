@@ -40,10 +40,8 @@ export function App() {
           <Route index element={<LandingPage />} />
           <Route path="/ppdb" element={<PpdbPublicPage />} />
           <Route path="/status-seleksi" element={<SelectionStatusPage />} />
+          <Route path="/login" element={<LoginPage />} />
         </Route>
-
-        {/* Standalone Unified SSO Login */}
-        <Route path="/login" element={<LoginPage />} />
 
         {/* Authenticated Core ERP Portal Routes */}
         <Route

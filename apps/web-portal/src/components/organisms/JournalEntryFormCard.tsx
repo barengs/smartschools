@@ -42,7 +42,7 @@ export function JournalEntryFormCard() {
     <Card padding="lg" className="space-y-5">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#163b8c] text-white">
+          <div className="flex h-8 w-8 items-center justify-center rounded bg-[#163b8c] text-white">
             <NotebookPen className="h-4 w-4" />
           </div>
           <div>
@@ -99,7 +99,7 @@ export function JournalEntryFormCard() {
                   key={method}
                   type="button"
                   onClick={() => dispatch(toggleJournalMethod(method))}
-                  className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold transition-colors cursor-pointer ${
+                  className={`inline-flex items-center gap-1.5 rounded border px-3 py-1.5 text-xs font-bold transition-colors cursor-pointer ${
                     active
                       ? 'border-[#163b8c] bg-[#163b8c] text-white'
                       : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
@@ -129,7 +129,7 @@ export function JournalEntryFormCard() {
           rightSlot={<span>Maks. 2 Foto • Auto-Kompres</span>}
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-            <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-gradient-to-br from-slate-800 to-slate-700 p-4 text-white h-28 flex flex-col justify-end">
+            <div className="relative overflow-hidden rounded border border-slate-200 bg-gradient-to-br from-slate-800 to-slate-700 p-4 text-white h-28 flex flex-col justify-end">
               <Badge tone="navy" className="self-start">
                 Foto Lab Kalori.jpg
               </Badge>
@@ -138,7 +138,7 @@ export function JournalEntryFormCard() {
               </div>
             </div>
 
-            <label className="flex h-28 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 text-slate-600 hover:border-blue-400 hover:bg-blue-50/40 transition-colors">
+            <label className="flex h-28 cursor-pointer flex-col items-center justify-center rounded border-2 border-dashed border-slate-300 bg-slate-50 text-slate-600 hover:border-blue-400 hover:bg-blue-50/40 transition-colors">
               <Upload className="h-5 w-5 text-[#163b8c]" />
               <span className="mt-1.5 text-xs font-bold">Pilih Berkas</span>
               <span className="text-[10px] text-slate-500">Format JPG, PNG (Maks 5MB)</span>
@@ -147,7 +147,7 @@ export function JournalEntryFormCard() {
           </div>
         </FormField>
 
-        <label className="flex items-start gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-xs cursor-pointer">
+        <label className="flex items-start gap-2.5 rounded border border-slate-200 bg-slate-50 px-3.5 py-3 text-xs cursor-pointer">
           <input
             type="checkbox"
             checked={journalSyncParent}

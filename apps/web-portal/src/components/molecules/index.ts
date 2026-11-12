@@ -2,6 +2,7 @@ export { AchievementCard, TestimonialCard } from './AchievementCard';
 export { AuthFeatureItem } from './AuthFeatureItem';
 export { DocChecklistItem } from './DocChecklistItem';
 export { FormField } from './FormField';
+export { MapboxGeotagMap } from './MapboxGeotagMap';
 export { PaginationBar } from './PaginationBar';
 export { PillarCard } from './PillarCard';
 export { ProgressMeter } from './ProgressMeter';

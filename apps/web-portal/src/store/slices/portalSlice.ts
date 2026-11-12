@@ -1,4 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ApiError, apiRequest } from '../../api/client';
 
 export type EwsRiskFilter = 'ALL' | 'CRITICAL' | 'MEDIUM';
 export type AttendanceCode = 'H' | 'S' | 'I' | 'A';
@@ -284,8 +285,66 @@ export const BUKU_INDUK_RECORDS: BukuIndukStudentRecord[] = [
   },
 ];
 
+export interface DashboardSummaryData {
+  period: string;
+  kpis: {
+    activeStudents: number;
+    presentToday: number;
+    attendanceRate: number;
+    totalClassrooms: number;
+    totalPpdbApplicants: number;
+    verifiedPpdbApplicants: number;
+    paidInvoiceAmount: number;
+    unpaidInvoiceAmount: number;
+    collectionRate: number;
+    unresolvedCriticalEws: number;
+    unresolvedMediumEws: number;
+  };
+  ewsRows: Array<{
+    id: string;
+    student_id: string;
+    full_name: string;
+    nisn: string | null;
+    classroom_name: string | null;
+    risk_level: 'LOW' | 'MEDIUM' | 'CRITICAL';
+    attendance_risk_score: number;
+    academic_drop_score: number;
+    recommended_action: string;
+    is_resolved_by_bk: boolean;
+    calculated_date: string;
+  }>;
+}
+
+export interface DbStudentSummary {
+  id: string;
+  user_id: string;
+  nis: string | null;
+  nisn: string | null;
+  nik: string | null;
+  full_name: string;
+  gender: string | null;
+  status: string;
+  dapodik_sync_id: string | null;
+}
+
 interface PortalState {
   academicYear: string;
+  dashboardSummary: DashboardSummaryData | null;
+  dashboardLoading: boolean;
+  dbStudents: DbStudentSummary[];
+  dbSchedules: Array<{
+    id: string;
+    classroom_id: string;
+    classroom_name: string;
+    subject_id: string;
+    subject_name: string;
+    teacher_id: string;
+    teacher_name: string;
+    room_code: string | null;
+    day_of_week: number;
+    start_time: string;
+    end_time: string;
+  }>;
   ewsFilter: EwsRiskFilter;
   ewsShowAll: boolean;
   journalActiveSessionId: string;
@@ -305,6 +364,10 @@ interface PortalState {
 
 const initialState: PortalState = {
   academicYear: 'TA 2026/2027 Ganjil',
+  dashboardSummary: null,
+  dashboardLoading: false,
+  dbStudents: [],
+  dbSchedules: [],
   ewsFilter: 'ALL',
   ewsShowAll: false,
   journalActiveSessionId: 'ses-2',
@@ -322,6 +385,46 @@ const initialState: PortalState = {
   bukuIndukStatusFilter: 'Aktif',
   bukuIndukActiveTab: 'RAPOR',
 };
+
+export const fetchDashboardSummary = createAsyncThunk<
+  DashboardSummaryData,
+  void,
+  { rejectValue: string }
+>('portal/fetchDashboardSummary', async (_, { rejectWithValue }) => {
+  try {
+    return await apiRequest<DashboardSummaryData>('/api/v1/core/siakad/dashboard-summary');
+  } catch (err) {
+    return rejectWithValue((err as ApiError).message ?? 'Gagal memuat ringkasan dashboard');
+  }
+});
+
+export const resolveEwsAlert = createAsyncThunk<
+  { id: string; is_resolved_by_bk: boolean },
+  string,
+  { rejectValue: string }
+>('portal/resolveEwsAlert', async (id, { rejectWithValue }) => {
+  try {
+    return await apiRequest<{ id: string; is_resolved_by_bk: boolean }>(
+      `/api/v1/core/siakad/ews/${id}/resolve`,
+      { method: 'PATCH' },
+    );
+  } catch (err) {
+    return rejectWithValue((err as ApiError).message ?? 'Gagal menandai EWS selesai');
+  }
+});
+
+export const fetchDbStudents = createAsyncThunk<
+  DbStudentSummary[],
+  { q?: string },
+  { rejectValue: string }
+>('portal/fetchDbStudents', async ({ q }, { rejectWithValue }) => {
+  try {
+    const query = q?.trim() ? `?q=${encodeURIComponent(q.trim())}` : '';
+    return await apiRequest<DbStudentSummary[]>(`/api/v1/core/siakad/students${query}`);
+  } catch (err) {
+    return rejectWithValue((err as ApiError).message ?? 'Gagal memuat data siswa');
+  }
+});
 
 const portalSlice = createSlice({
   name: 'portal',
@@ -396,6 +499,38 @@ const portalSlice = createSlice({
     setBukuIndukActiveTab(state, action: PayloadAction<BukuIndukTab>) {
       state.bukuIndukActiveTab = action.payload;
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchDashboardSummary.pending, (state) => {
+        state.dashboardLoading = true;
+      })
+      .addCase(fetchDashboardSummary.fulfilled, (state, action) => {
+        state.dashboardLoading = false;
+        state.dashboardSummary = action.payload;
+        if (action.payload.period) {
+          state.academicYear = action.payload.period;
+        }
+      })
+      .addCase(fetchDashboardSummary.rejected, (state) => {
+        state.dashboardLoading = false;
+      })
+      .addCase(resolveEwsAlert.fulfilled, (state, action) => {
+        if (state.dashboardSummary) {
+          state.dashboardSummary.ewsRows = state.dashboardSummary.ewsRows.map((r) =>
+            r.id === action.payload.id ? { ...r, is_resolved_by_bk: true } : r,
+          );
+          state.dashboardSummary.kpis.unresolvedCriticalEws = state.dashboardSummary.ewsRows.filter(
+            (r) => r.risk_level === 'CRITICAL' && !r.is_resolved_by_bk,
+          ).length;
+          state.dashboardSummary.kpis.unresolvedMediumEws = state.dashboardSummary.ewsRows.filter(
+            (r) => r.risk_level === 'MEDIUM' && !r.is_resolved_by_bk,
+          ).length;
+        }
+      })
+      .addCase(fetchDbStudents.fulfilled, (state, action) => {
+        state.dbStudents = action.payload;
+      });
   },
 });
 

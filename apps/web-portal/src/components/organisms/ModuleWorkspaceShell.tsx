@@ -39,7 +39,7 @@ export function ModuleWorkspaceShell({
   return (
     <div className="space-y-6">
       {banner && (
-        <div className="flex flex-wrap items-center gap-2.5 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs shadow-2xs">
+        <div className="flex flex-wrap items-center gap-2.5 rounded border border-slate-200 bg-white px-4 py-3 text-xs shadow-2xs">
           <Badge tone={banner.tone} uppercase>
             {banner.tag}
           </Badge>
@@ -61,7 +61,7 @@ export function ModuleWorkspaceShell({
 
       <div className={rightRail ? 'grid grid-cols-1 gap-6 lg:grid-cols-12 items-start' : ''}>
         <div className={rightRail ? 'lg:col-span-8 space-y-4' : 'space-y-4'}>
-          <div className="flex flex-wrap items-center gap-1.5 rounded-2xl border border-slate-200 bg-white p-1.5 shadow-2xs">
+          <div className="flex flex-wrap items-center gap-1.5 rounded border border-slate-200 bg-white p-1.5 shadow-2xs">
             {tabs.map((tab) => {
               const active = tab.key === currentTab?.key;
               return (
@@ -69,7 +69,7 @@ export function ModuleWorkspaceShell({
                   key={tab.key}
                   type="button"
                   onClick={() => setActiveKey(tab.key)}
-                  className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold transition-colors cursor-pointer ${
+                  className={`inline-flex items-center gap-1.5 rounded px-3.5 py-2 text-xs font-bold transition-colors cursor-pointer ${
                     active
                       ? 'bg-[#163b8c] text-white shadow-xs'
                       : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'

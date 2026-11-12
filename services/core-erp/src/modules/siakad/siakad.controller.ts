@@ -112,5 +112,41 @@ export class SiakadController {
   createTeacher(@Body() dto: CreateTeacherDto) {
     return this.siakadService.createTeacher(dto);
   }
+
+  @Get('dashboard-summary')
+  dashboardSummary() {
+    return this.siakadService.getDashboardSummary();
+  }
+
+  @Patch('ews/:id/resolve')
+  @Roles('SUPER_ADMIN', 'KEPALA_SEKOLAH', 'GURU_BK', 'STAF_TU')
+  resolveEws(@Param('id', ParseUUIDPipe) id: string) {
+    return this.siakadService.resolveEwsRisk(id);
+  }
+
+  @Get('students/:id/profile360')
+  @Roles('SUPER_ADMIN', 'KEPALA_SEKOLAH', 'WAKA_KURIKULUM', 'STAF_TU', 'GURU', 'GURU_BK')
+  studentProfile360(@Param('id', ParseUUIDPipe) id: string) {
+    return this.siakadService.getStudentProfile360(id);
+  }
+
+  @Get('teaching-journals')
+  listTeachingJournals() {
+    return this.siakadService.listTeachingJournals();
+  }
+
+  @Post('teaching-journals')
+  @Roles('SUPER_ADMIN', 'GURU', 'WAKA_KURIKULUM')
+  createTeachingJournal(
+    @Body()
+    body: {
+      scheduleId: string;
+      topic: string;
+      notes?: string;
+      attendance?: Array<{ studentUserId: string; status: 'PRESENT' | 'SICK' | 'PERMIT' | 'ALPHA' }>;
+    },
+  ) {
+    return this.siakadService.createTeachingJournal(body);
+  }
 }
 

@@ -14,23 +14,23 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
   primary:
-    'bg-[#163b8c] hover:bg-[#0f2b6b] text-white border border-transparent shadow-sm shadow-blue-950/15',
+    'bg-[#0d6efd] hover:bg-[#0b5ed7] active:bg-[#0a58ca] text-white border border-[#0d6efd]',
   secondary:
-    'bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200',
+    'bg-[#6c757d] hover:bg-[#5c636a] text-white border border-[#6c757d]',
   outline:
-    'bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 shadow-2xs',
+    'bg-white hover:bg-[#f8f9fa] text-[#0d6efd] border border-[#0d6efd]',
   ghost:
-    'bg-transparent hover:bg-slate-100 text-slate-700 border border-transparent',
+    'bg-transparent hover:bg-[#e9ecef] text-[#212529] border border-[#dee2e6]',
   emerald:
-    'bg-emerald-600 hover:bg-emerald-700 text-white border border-transparent shadow-sm',
+    'bg-[#198754] hover:bg-[#157347] text-white border border-[#198754]',
   danger:
-    'bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200',
+    'bg-[#dc3545] hover:bg-[#bb2d3b] text-white border border-[#dc3545]',
 };
 
 const SIZE_CLASSES: Record<ButtonSize, string> = {
-  sm: 'px-3 py-1.5 text-xs rounded-lg gap-1.5',
-  md: 'px-4 py-2.5 text-sm rounded-xl gap-2',
-  lg: 'px-5 py-3 text-sm rounded-xl gap-2',
+  sm: 'px-3 py-1.5 text-sm rounded-sm gap-1.5 sm:whitespace-nowrap',
+  md: 'px-4 py-2 text-[15px] rounded gap-2 sm:whitespace-nowrap',
+  lg: 'px-5 py-2.5 text-base rounded gap-2 sm:whitespace-nowrap',
 };
 
 export function Button({

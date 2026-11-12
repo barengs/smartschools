@@ -61,7 +61,7 @@ export function SmartLmsPage() {
                   <Badge tone="emerald">Conditional Release Aktif</Badge>
                 </div>
                 {MODULE_BLOCKS.map((b) => (
-                  <div key={b.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-xl border border-slate-200 p-3.5 bg-slate-50/50">
+                  <div key={b.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded border border-slate-200 p-3.5 bg-slate-50/50">
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
                         <Badge tone="navy">Blok #{b.order}</Badge>
@@ -97,7 +97,7 @@ export function SmartLmsPage() {
               { cluster: 'Steady Visual Learner', count: '17 Siswa', tone: 'blue' as const },
               { cluster: 'Need Scaffold / Remedial', count: '5 Siswa', tone: 'amber' as const },
             ].map((c) => (
-              <div key={c.cluster} className="flex items-center justify-between rounded-xl border border-slate-200 p-3 text-xs">
+              <div key={c.cluster} className="flex items-center justify-between rounded border border-slate-200 p-3 text-xs">
                 <span className="font-bold text-slate-800">{c.cluster}</span>
                 <Badge tone={c.tone}>{c.count}</Badge>
               </div>

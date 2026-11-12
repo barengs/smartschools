@@ -57,7 +57,7 @@ export function SelectionResultSection() {
               </h3>
             </div>
           </div>
-          <span className="inline-flex items-center gap-1.5 rounded-xl border border-white/20 bg-black/20 px-3 py-1.5 text-[11px] font-bold">
+          <span className="inline-flex items-center gap-1.5 rounded border border-white/20 bg-black/20 px-3 py-1.5 text-[11px] font-bold">
             <ShieldCheck className="h-4 w-4 text-emerald-300" />
             TERVERIFIKASI SISTEM E-PPDB
           </span>
@@ -66,9 +66,9 @@ export function SelectionResultSection() {
         {/* Scorecard body */}
         <div className="p-5 sm:p-7 grid grid-cols-1 gap-6 lg:grid-cols-12">
           {/* Left Student Profile */}
-          <div className="lg:col-span-4 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 space-y-4">
+          <div className="lg:col-span-4 rounded border border-slate-200 bg-slate-50/70 p-4 space-y-4">
             <div className="flex items-center gap-3.5">
-              <div className="flex h-16 w-14 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#0f2b6b] to-blue-600 text-sm font-extrabold text-white shadow-xs">
+              <div className="flex h-16 w-14 shrink-0 items-center justify-center rounded bg-gradient-to-br from-[#0f2b6b] to-blue-600 text-sm font-extrabold text-white shadow-xs">
                 {lookupResult.fullName
                   .split(' ')
                   .slice(0, 2)
@@ -112,7 +112,7 @@ export function SelectionResultSection() {
               </div>
             </div>
 
-            <div className="rounded-xl border border-slate-200 bg-white p-3">
+            <div className="rounded border border-slate-200 bg-white p-3">
               <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
                 Satuan Pendidikan Penempatan
               </div>
@@ -144,7 +144,7 @@ export function SelectionResultSection() {
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                <div className="rounded border border-slate-200 bg-white p-4">
                   <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500">
                     <span>Jarak Haversine</span>
                     <MapPin className="h-3.5 w-3.5 text-[#163b8c]" />
@@ -158,7 +158,7 @@ export function SelectionResultSection() {
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                <div className="rounded border border-slate-200 bg-white p-4">
                   <div className="text-[11px] font-semibold text-slate-500">Placement Test</div>
                   <div className="mt-2 text-2xl font-extrabold text-slate-900 tabular-nums">
                     {lookupResult.placementScore.toFixed(2)}
@@ -166,7 +166,7 @@ export function SelectionResultSection() {
                   <div className="mt-1 text-[11px] text-slate-500">Literasi &amp; Numerasi (Rust)</div>
                 </div>
 
-                <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                <div className="rounded border border-slate-200 bg-white p-4">
                   <div className="text-[11px] font-semibold text-slate-500">Nilai Rapor</div>
                   <div className="mt-2 text-2xl font-extrabold text-slate-900 tabular-nums">
                     {lookupResult.reportScore.toFixed(2)}
@@ -174,7 +174,7 @@ export function SelectionResultSection() {
                   <div className="mt-1 text-[11px] text-slate-500">5 Semester Terakhir</div>
                 </div>
 
-                <div className="rounded-2xl bg-gradient-to-br from-[#0f2b6b] to-[#1d4ed8] p-4 text-white shadow-md">
+                <div className="rounded bg-gradient-to-br from-[#0f2b6b] to-[#1d4ed8] p-4 text-white shadow-md">
                   <div className="flex items-center justify-between text-[11px] font-semibold text-blue-100">
                     <span>Nilai Akhir Gabungan</span>
                     <CheckCircle2 className="h-3.5 w-3.5 text-emerald-300" />
@@ -188,7 +188,7 @@ export function SelectionResultSection() {
                 </div>
               </div>
 
-              <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-600">
+              <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-600">
                 <div>
                   <span className="font-bold text-slate-800">Formula Pembobotan:</span> (Skor
                   Zonasi × 55%) + (CBT × 30%) + (Nilai Rapor × 15%) ={' '}

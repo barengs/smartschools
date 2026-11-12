@@ -43,7 +43,7 @@ export function JournalAttendancePanel() {
 
       {/* 4 status counter cards matching Screenshot 2 */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-3.5 flex items-center justify-between">
+        <div className="rounded border border-emerald-200 bg-emerald-50/70 p-3.5 flex items-center justify-between">
           <div>
             <div className="text-[11px] font-bold text-emerald-800">Hadir Fisik</div>
             <div className="text-2xl font-extrabold text-slate-900 tabular-nums mt-0.5">
@@ -53,7 +53,7 @@ export function JournalAttendancePanel() {
           <Users className="h-5 w-5 text-emerald-600" />
         </div>
 
-        <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-3.5 flex items-center justify-between">
+        <div className="rounded border border-amber-200 bg-amber-50/70 p-3.5 flex items-center justify-between">
           <div>
             <div className="text-[11px] font-bold text-amber-800">Sakit (Dokter)</div>
             <div className="text-2xl font-extrabold text-slate-900 tabular-nums mt-0.5">
@@ -63,7 +63,7 @@ export function JournalAttendancePanel() {
           <HeartPulse className="h-5 w-5 text-amber-600" />
         </div>
 
-        <div className="rounded-xl border border-blue-200 bg-blue-50/70 p-3.5 flex items-center justify-between">
+        <div className="rounded border border-blue-200 bg-blue-50/70 p-3.5 flex items-center justify-between">
           <div>
             <div className="text-[11px] font-bold text-blue-800">Dispensasi / Izin</div>
             <div className="text-2xl font-extrabold text-slate-900 tabular-nums mt-0.5">
@@ -73,7 +73,7 @@ export function JournalAttendancePanel() {
           <ShieldCheck className="h-5 w-5 text-[#163b8c]" />
         </div>
 
-        <div className="rounded-xl border border-rose-200 bg-rose-50/70 p-3.5 flex items-center justify-between">
+        <div className="rounded border border-rose-200 bg-rose-50/70 p-3.5 flex items-center justify-between">
           <div>
             <div className="text-[11px] font-bold text-rose-800">Tanpa Keterangan</div>
             <div className="text-2xl font-extrabold text-rose-700 tabular-nums mt-0.5">
@@ -91,7 +91,7 @@ export function JournalAttendancePanel() {
           <span>TOGGLE STATUS PRESENSI</span>
         </div>
 
-        <div className="divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white overflow-hidden">
+        <div className="divide-y divide-slate-100 rounded border border-slate-200 bg-white overflow-hidden">
           {students.map((st) => (
             <div
               key={st.id}
@@ -117,7 +117,7 @@ export function JournalAttendancePanel() {
                 </div>
               </div>
 
-              <div className="inline-flex items-center gap-1 rounded-xl bg-slate-100 p-1 self-start sm:self-auto shrink-0">
+              <div className="inline-flex items-center gap-1 rounded bg-slate-100 p-1 self-start sm:self-auto shrink-0">
                 {STATUS_CODES.map((code) => {
                   const active = st.status === code;
                   const activeClasses =
@@ -135,7 +135,7 @@ export function JournalAttendancePanel() {
                       onClick={() =>
                         dispatch(setStudentAttendanceStatus({ id: st.id, status: code }))
                       }
-                      className={`h-7 w-8 rounded-lg text-xs font-extrabold transition-colors cursor-pointer ${
+                      className={`h-7 w-8 rounded text-xs font-extrabold transition-colors cursor-pointer ${
                         active ? activeClasses : 'text-slate-500 hover:text-slate-900'
                       }`}
                     >

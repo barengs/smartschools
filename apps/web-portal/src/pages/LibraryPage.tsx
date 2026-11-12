@@ -71,7 +71,7 @@ export function LibraryPage() {
                 />
                 <div className="space-y-2.5 text-xs">
                   {filtered.map((b) => (
-                    <div key={b.isbn} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-xl border border-slate-200 p-3.5">
+                    <div key={b.isbn} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded border border-slate-200 p-3.5">
                       <div>
                         <div className="flex items-center gap-2 flex-wrap">
                           <Badge tone="navy">{b.ddc}</Badge>

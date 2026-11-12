@@ -30,10 +30,10 @@ export function ExecutiveRightRail() {
             onClick={() =>
               setQuickNotice('Antrean Broadcast WhatsApp wali murid disiapkan via BullMQ.')
             }
-            className="flex w-full items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50/70 px-3.5 py-2.5 text-left hover:bg-emerald-50 transition-colors cursor-pointer"
+            className="flex w-full items-center justify-between rounded border border-emerald-200 bg-emerald-50/70 px-3.5 py-2.5 text-left hover:bg-emerald-50 transition-colors cursor-pointer"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-600 text-white shrink-0">
+              <div className="flex h-8 w-8 items-center justify-center rounded bg-emerald-600 text-white shrink-0">
                 <MessageSquare className="h-4 w-4" />
               </div>
               <div>
@@ -51,10 +51,10 @@ export function ExecutiveRightRail() {
             onClick={() =>
               setQuickNotice('Laporan eksekutif PDF/Excel bertanda tangan TTE BSrE sedang digenerate.')
             }
-            className="flex w-full items-center justify-between rounded-xl border border-blue-200 bg-blue-50/60 px-3.5 py-2.5 text-left hover:bg-blue-50 transition-colors cursor-pointer"
+            className="flex w-full items-center justify-between rounded border border-blue-200 bg-blue-50/60 px-3.5 py-2.5 text-left hover:bg-blue-50 transition-colors cursor-pointer"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#163b8c] text-white shrink-0">
+              <div className="flex h-8 w-8 items-center justify-center rounded bg-[#163b8c] text-white shrink-0">
                 <Download className="h-4 w-4" />
               </div>
               <div>
@@ -72,10 +72,10 @@ export function ExecutiveRightRail() {
             onClick={() =>
               setQuickNotice('Job rekalkulasi EWS Python Service C dipicu (model Scikit-learn v4.2).')
             }
-            className="flex w-full items-center justify-between rounded-xl border border-rose-200 bg-rose-50/60 px-3.5 py-2.5 text-left hover:bg-rose-50 transition-colors cursor-pointer"
+            className="flex w-full items-center justify-between rounded border border-rose-200 bg-rose-50/60 px-3.5 py-2.5 text-left hover:bg-rose-50 transition-colors cursor-pointer"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-600 text-white shrink-0">
+              <div className="flex h-8 w-8 items-center justify-center rounded bg-rose-600 text-white shrink-0">
                 <RefreshCw className="h-4 w-4" />
               </div>
               <div>
@@ -98,7 +98,7 @@ export function ExecutiveRightRail() {
           <Badge tone="emerald">Audit Sehat</Badge>
         </div>
 
-        <div className="rounded-xl bg-slate-50 border border-slate-200/80 p-3.5">
+        <div className="rounded bg-slate-50 border border-slate-200/80 p-3.5">
           <div className="text-[11px] font-semibold text-slate-500">
             Total Saldo Likuid Terkonsolidasi
           </div>
@@ -146,8 +146,8 @@ export function ExecutiveRightRail() {
         </div>
 
         <div className="space-y-2.5">
-          <div className="flex items-start gap-3 rounded-xl border border-slate-200 p-3">
-            <div className="rounded-lg bg-blue-50 px-2.5 py-1.5 text-center shrink-0">
+          <div className="flex items-start gap-3 rounded border border-slate-200 p-3">
+            <div className="rounded bg-blue-50 px-2.5 py-1.5 text-center shrink-0">
               <div className="text-[9px] font-extrabold text-[#163b8c]">H-12</div>
               <div className="text-xs font-extrabold text-slate-900 tabular-nums">05 Nov</div>
             </div>
@@ -164,8 +164,8 @@ export function ExecutiveRightRail() {
             </div>
           </div>
 
-          <div className="flex items-start gap-3 rounded-xl border border-slate-200 p-3">
-            <div className="rounded-lg bg-rose-50 px-2.5 py-1.5 text-center shrink-0">
+          <div className="flex items-start gap-3 rounded border border-slate-200 p-3">
+            <div className="rounded bg-rose-50 px-2.5 py-1.5 text-center shrink-0">
               <div className="text-[9px] font-extrabold text-rose-700">H-4</div>
               <div className="text-xs font-extrabold text-slate-900 tabular-nums">28 Okt</div>
             </div>
@@ -182,8 +182,8 @@ export function ExecutiveRightRail() {
             </div>
           </div>
 
-          <div className="flex items-start gap-3 rounded-xl border border-slate-200 p-3">
-            <div className="rounded-lg bg-slate-100 px-2.5 py-1.5 text-center shrink-0">
+          <div className="flex items-start gap-3 rounded border border-slate-200 p-3">
+            <div className="rounded bg-slate-100 px-2.5 py-1.5 text-center shrink-0">
               <div className="text-[9px] font-extrabold text-slate-600">H-19</div>
               <div className="text-xs font-extrabold text-slate-900 tabular-nums">12 Nov</div>
             </div>

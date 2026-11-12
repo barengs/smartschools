@@ -18,21 +18,20 @@ export function PillarCard({
 }: PillarCardProps) {
   return (
     <Card
-      padding="md"
-      className="flex flex-col justify-between hover:border-blue-300 hover:shadow-md transition-all duration-200"
+      padding="none"
+      className="flex flex-col justify-between overflow-hidden h-full hover:border-[#86b7fe] transition-colors"
     >
-      <div>
-        <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-[#163b8c] border border-blue-100">
+      <div className="p-5 flex-1">
+        <div className="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-md bg-[#cfe2ff] text-[#084298]">
           {icon}
         </div>
-        <h3 className="text-base font-bold text-slate-900">{title}</h3>
-        <p className="mt-2 text-xs leading-relaxed text-slate-600">{description}</p>
+        <h3 className="text-lg font-semibold text-[#212529]">{title}</h3>
+        <p className="mt-2 text-[15px] leading-relaxed text-[#495057]">{description}</p>
       </div>
-      <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-3 text-[11px] font-bold text-[#163b8c]">
+      <div className="flex items-center justify-between border-t border-[#dee2e6] bg-[#f8f9fa] px-5 py-3 text-sm font-medium text-[#0a58ca]">
         <span>{footerLabel}</span>
         {footerIcon}
       </div>
     </Card>
   );
 }
-

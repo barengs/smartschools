@@ -7,7 +7,7 @@ import { BrandLogo, Button } from '../atoms';
 const PUBLIC_NAV_LINKS = [
   { to: '/', label: 'Beranda' },
   { to: '/#jalur-masuk', label: 'Jalur Masuk', hash: true },
-  { to: '/#biaya-ppdb', label: 'Biaya', hash: true },
+  { to: '/#biaya-ppdb', label: 'Biaya & Jadwal', hash: true },
   { to: '/status-seleksi', label: 'Status Seleksi' },
   { to: '/#bantuan-ppdb', label: 'Bantuan', hash: true },
 ];
@@ -18,19 +18,19 @@ export function PublicNavbar() {
   const navigate = useNavigate();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200/90 bg-white/95 backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
-        <Link to="/" className="hover:opacity-95 transition-opacity">
-          <BrandLogo variant="dark" subtitle="INTEGRATED ECOSYSTEM" />
+    <header className="sticky top-0 z-40 border-b border-[#dee2e6] bg-white">
+      <div className="bs-container flex h-16 items-center justify-between gap-4">
+        <Link to="/" className="shrink-0">
+          <BrandLogo variant="dark" subtitle="Portal Akademik & PPDB" compact />
         </Link>
 
-        <nav className="hidden md:flex items-center gap-7">
+        <nav className="hidden lg:flex items-center gap-6">
           {PUBLIC_NAV_LINKS.map((item) =>
             item.hash ? (
               <a
                 key={item.label}
                 href={item.to}
-                className="text-sm font-medium text-slate-600 hover:text-[#163b8c] transition-colors"
+                className="text-[15px] font-medium text-[#495057] hover:text-[#0d6efd] transition-colors whitespace-nowrap"
               >
                 {item.label}
               </a>
@@ -40,10 +40,10 @@ export function PublicNavbar() {
                 to={item.to}
                 end={item.to === '/'}
                 className={({ isActive }) =>
-                  `text-sm font-semibold transition-colors ${
+                  `text-[15px] font-medium transition-colors whitespace-nowrap ${
                     isActive
-                      ? 'text-[#163b8c] underline decoration-2 underline-offset-8'
-                      : 'text-slate-600 hover:text-[#163b8c]'
+                      ? 'text-[#0d6efd] font-semibold'
+                      : 'text-[#495057] hover:text-[#0d6efd]'
                   }`
                 }
               >
@@ -53,7 +53,7 @@ export function PublicNavbar() {
           )}
         </nav>
 
-        <div className="hidden md:flex items-center gap-2.5">
+        <div className="hidden lg:flex items-center gap-2 shrink-0">
           {session ? (
             <Button
               variant="outline"
@@ -65,25 +65,17 @@ export function PublicNavbar() {
             </Button>
           ) : (
             <Button variant="outline" size="sm" onClick={() => navigate('/login')}>
-              Masuk
+              Masuk Portal
             </Button>
           )}
           <Button variant="primary" size="sm" onClick={() => navigate('/ppdb')}>
-            Daftar Sekarang
+            Daftar PPDB
           </Button>
-          <button
-            type="button"
-            title={session ? 'Buka Dashboard SSO' : 'Masuk Akun'}
-            onClick={() => navigate(session ? '/dashboard' : '/login')}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 cursor-pointer"
-          >
-            <User className="h-4 w-4" />
-          </button>
         </div>
 
         <button
           type="button"
-          className="md:hidden rounded-lg p-2 text-slate-600 hover:bg-slate-100"
+          className="lg:hidden rounded-md border border-[#dee2e6] p-2 text-[#495057] hover:bg-[#f8f9fa]"
           onClick={() => setMobileOpen((prev) => !prev)}
           aria-label="Toggle Menu"
         >
@@ -92,15 +84,15 @@ export function PublicNavbar() {
       </div>
 
       {mobileOpen && (
-        <div className="md:hidden border-t border-slate-200 bg-white px-4 py-4 space-y-3">
-          <div className="flex flex-col gap-2">
+        <div className="lg:hidden border-t border-[#dee2e6] bg-white px-4 py-4 space-y-3">
+          <div className="flex flex-col gap-1">
             {PUBLIC_NAV_LINKS.map((item) =>
               item.hash ? (
                 <a
                   key={item.label}
                   href={item.to}
                   onClick={() => setMobileOpen(false)}
-                  className="rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                  className="rounded-md px-3 py-2 text-base font-medium text-[#495057] hover:bg-[#f8f9fa]"
                 >
                   {item.label}
                 </a>
@@ -111,8 +103,8 @@ export function PublicNavbar() {
                   end={item.to === '/'}
                   onClick={() => setMobileOpen(false)}
                   className={({ isActive }) =>
-                    `rounded-lg px-3 py-2 text-sm font-semibold ${
-                      isActive ? 'bg-blue-50 text-[#163b8c]' : 'text-slate-700 hover:bg-slate-50'
+                    `rounded-md px-3 py-2 text-base font-medium ${
+                      isActive ? 'bg-[#cfe2ff]/50 text-[#0a58ca] font-semibold' : 'text-[#495057] hover:bg-[#f8f9fa]'
                     }`
                   }
                 >
@@ -121,28 +113,28 @@ export function PublicNavbar() {
               ),
             )}
           </div>
-          <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+          <div className="flex flex-col sm:flex-row items-center gap-2 pt-3 border-t border-[#dee2e6]">
             <Button
               variant="outline"
-              size="sm"
+              size="md"
               fullWidth
               onClick={() => {
                 setMobileOpen(false);
                 navigate(session ? '/dashboard' : '/login');
               }}
             >
-              {session ? 'Portal ERP' : 'Masuk'}
+              {session ? 'Buka Portal ERP' : 'Masuk Portal'}
             </Button>
             <Button
               variant="primary"
-              size="sm"
+              size="md"
               fullWidth
               onClick={() => {
                 setMobileOpen(false);
                 navigate('/ppdb');
               }}
             >
-              Daftar Sekarang
+              Daftar PPDB
             </Button>
           </div>
         </div>
@@ -150,4 +142,3 @@ export function PublicNavbar() {
     </header>
   );
 }
-

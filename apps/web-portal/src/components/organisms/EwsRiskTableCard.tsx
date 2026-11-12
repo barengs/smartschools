@@ -1,49 +1,67 @@
+import { CheckCircle2 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store';
-import { EWS_RISK_ROWS, setEwsFilter, toggleEwsShowAll } from '../../store/slices/portalSlice';
-import { Badge, Card } from '../atoms';
+import {
+  EWS_RISK_ROWS,
+  resolveEwsAlert,
+  setEwsFilter,
+  toggleEwsShowAll,
+} from '../../store/slices/portalSlice';
+import { Badge, Button, Card } from '../atoms';
 
 export function EwsRiskTableCard() {
   const dispatch = useAppDispatch();
-  const { ewsFilter, ewsShowAll } = useAppSelector((s) => s.portal);
+  const { ewsFilter, ewsShowAll, dashboardSummary } = useAppSelector((s) => s.portal);
 
-  const filtered = EWS_RISK_ROWS.filter((row) =>
+  const liveRows =
+    dashboardSummary?.ewsRows && dashboardSummary.ewsRows.length > 0
+      ? dashboardSummary.ewsRows.map((r) => ({
+          id: r.id,
+          name: r.full_name,
+          nisn: r.nisn ?? '-',
+          className: r.classroom_name ?? 'Aktif',
+          riskLevel: r.risk_level === 'CRITICAL' ? ('CRITICAL' as const) : ('MEDIUM' as const),
+          riskScore: Number(r.attendance_risk_score),
+          factors: [`Skor Kehadiran: ${r.attendance_risk_score}%`, `Skor Akademik: ${r.academic_drop_score}%`],
+          recommendedAction: r.recommended_action,
+          resolved: r.is_resolved_by_bk,
+          isFromDb: true,
+        }))
+      : EWS_RISK_ROWS.map((r) => ({ ...r, resolved: false, isFromDb: false }));
+
+  const filtered = liveRows.filter((row) =>
     ewsFilter === 'ALL' ? true : row.riskLevel === ewsFilter,
   );
   const displayed = ewsShowAll ? filtered : filtered.slice(0, 5);
 
+  const criticalCount = liveRows.filter((r) => r.riskLevel === 'CRITICAL').length;
+  const mediumCount = liveRows.filter((r) => r.riskLevel === 'MEDIUM').length;
+
   return (
     <Card padding="none" className="overflow-hidden">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 px-5 py-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#dee2e6] bg-[#f8f9fa] px-5 py-3.5">
         <div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <h2 className="text-base font-extrabold text-slate-900">EWS AI Student Risk Alert</h2>
-            <code className="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-[#163b8c]">
-              finance_analytics.ews_risk
-            </code>
-          </div>
-          <p className="mt-0.5 text-xs text-slate-500">
-            Dihasilkan oleh Service AI Python berdasarkan 18 parameter akademik, kehadiran, &amp;
-            finansial.
+          <h2 className="text-base font-bold text-[#212529]">Daftar Pemantauan Siswa (EWS)</h2>
+          <p className="text-xs text-[#6c757d]">
+            Indikator kehadiran, pelanggaran disiplin, dan penurunan akademik siswa
           </p>
         </div>
 
-        <div className="inline-flex items-center gap-1 rounded-xl bg-slate-100 p-1 text-[11px] font-bold self-start sm:self-auto">
-          <span className="px-2 text-slate-500 hidden sm:inline">Filter Tingkat:</span>
+        <div className="inline-flex rounded-md border border-[#dee2e6] bg-white p-1 text-xs font-semibold self-start sm:self-auto">
           {(
             [
-              { key: 'ALL', label: 'Semua (14)' },
-              { key: 'CRITICAL', label: 'Kritis (3)' },
-              { key: 'MEDIUM', label: 'Sedang (11)' },
+              { key: 'ALL', label: `Semua (${liveRows.length})` },
+              { key: 'CRITICAL', label: `Kritis (${criticalCount})` },
+              { key: 'MEDIUM', label: `Sedang (${mediumCount})` },
             ] as const
           ).map((tab) => (
             <button
               key={tab.key}
               type="button"
               onClick={() => dispatch(setEwsFilter(tab.key))}
-              className={`rounded-lg px-2.5 py-1 transition-colors cursor-pointer ${
+              className={`rounded px-2.5 py-1 transition-colors cursor-pointer ${
                 ewsFilter === tab.key
-                  ? 'bg-white text-[#163b8c] shadow-2xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#0d6efd] text-white'
+                  : 'text-[#495057] hover:bg-[#f8f9fa]'
               }`}
             >
               {tab.label}
@@ -52,71 +70,59 @@ export function EwsRiskTableCard() {
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse text-xs">
+      <div className="w-full overflow-x-auto">
+        <table className="w-full text-left border-collapse text-sm">
           <thead>
-            <tr className="border-b border-slate-100 bg-slate-50/70 text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
-              <th className="px-5 py-3">Identitas Siswa</th>
-              <th className="px-4 py-3">Tingkat Risiko</th>
-              <th className="px-4 py-3">Faktor Penyebab Utama</th>
-              <th className="px-5 py-3">Rekomendasi Tindakan AI</th>
+            <tr className="border-b border-[#dee2e6] bg-[#f8f9fa] text-xs font-semibold uppercase text-[#495057]">
+              <th className="px-4 py-3">Identitas Siswa</th>
+              <th className="px-4 py-3">Tingkat</th>
+              <th className="px-4 py-3">Indikator Utama</th>
+              <th className="px-4 py-3">Rekomendasi &amp; Aksi</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100 bg-white">
+          <tbody className="divide-y divide-[#dee2e6] bg-white">
             {displayed.map((row) => {
               const isCritical = row.riskLevel === 'CRITICAL';
               return (
-                <tr key={row.id} className="hover:bg-slate-50/70 transition-colors">
-                  <td className="px-5 py-3.5">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 border border-blue-100 text-xs font-extrabold text-[#163b8c]">
-                        {row.initials}
-                      </div>
-                      <div>
-                        <div className="font-bold text-slate-900">{row.name}</div>
-                        <div className="text-[11px] text-slate-500 tabular-nums">
-                          NISN {row.nisn} · <strong className="text-slate-700">{row.className}</strong>
-                        </div>
-                      </div>
+                <tr key={row.id} className="hover:bg-[#f8f9fa]">
+                  <td className="px-4 py-3">
+                    <div className="font-semibold text-[#212529]">{row.name}</div>
+                    <div className="text-xs text-[#6c757d] tabular-nums">
+                      NISN {row.nisn} · {row.className}
                     </div>
                   </td>
 
-                  <td className="px-4 py-3.5">
-                    <Badge tone={isCritical ? 'rose' : 'amber'}>
-                      <span
-                        className={`h-1.5 w-1.5 rounded-full ${
-                          isCritical ? 'bg-rose-600' : 'bg-amber-600'
-                        }`}
-                      />
-                      <span className="tabular-nums">
-                        {row.riskLevel} ({row.riskScore.toFixed(1)}%)
-                      </span>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <Badge tone={row.resolved ? 'emerald' : isCritical ? 'rose' : 'amber'}>
+                      {row.resolved ? 'SELESAI BK' : `${row.riskLevel} (${row.riskScore}%)`}
                     </Badge>
                   </td>
 
-                  <td className="px-4 py-3.5 max-w-xs">
-                    <div className="font-bold text-slate-800">{row.factors[0]}</div>
+                  <td className="px-4 py-3">
+                    <div className="font-medium text-[#212529]">{row.factors[0]}</div>
                     {row.factors[1] && (
-                      <div
-                        className={`text-[11px] mt-0.5 ${
-                          isCritical ? 'text-rose-700 font-medium' : 'text-slate-500'
-                        }`}
-                      >
-                        {row.factors[1]}
-                      </div>
+                      <div className="text-xs text-[#6c757d] mt-0.5">{row.factors[1]}</div>
                     )}
                   </td>
 
-                  <td className="px-5 py-3.5">
-                    <div
-                      className={`inline-block rounded-xl border px-3 py-1.5 text-[11px] font-bold leading-snug ${
-                        isCritical
-                          ? 'border-rose-200 bg-rose-50/70 text-rose-800'
-                          : 'border-blue-200 bg-blue-50/70 text-[#163b8c]'
-                      }`}
-                    >
+                  <td className="px-4 py-3">
+                    <div className="text-xs font-medium text-[#212529] mb-1.5">
                       {row.recommendedAction}
                     </div>
+                    {row.isFromDb && !row.resolved ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        leftIcon={<CheckCircle2 className="h-3.5 w-3.5" />}
+                        onClick={() => dispatch(resolveEwsAlert(row.id))}
+                      >
+                        Tandai Ditangani
+                      </Button>
+                    ) : (
+                      <span className="text-xs text-[#198754] font-medium">
+                        {row.resolved ? 'Sudah ditindaklanjuti' : 'Siap Ditinjau'}
+                      </span>
+                    )}
                   </td>
                 </tr>
               );
@@ -125,20 +131,18 @@ export function EwsRiskTableCard() {
         </table>
       </div>
 
-      <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/60 px-5 py-3 text-xs">
-        <span className="text-slate-500">
-          Menampilkan <strong>{displayed.length}</strong> dari <strong>14</strong> antrean risiko
-          aktif
+      <div className="flex items-center justify-between border-t border-[#dee2e6] bg-[#f8f9fa] px-5 py-3 text-sm">
+        <span className="text-[#6c757d]">
+          Menampilkan <strong>{displayed.length}</strong> dari <strong>{filtered.length}</strong> data
         </span>
         <button
           type="button"
           onClick={() => dispatch(toggleEwsShowAll())}
-          className="font-extrabold text-[#163b8c] hover:underline cursor-pointer"
+          className="font-semibold text-[#0d6efd] hover:underline cursor-pointer"
         >
-          {ewsShowAll ? 'Tampilkan Ringkas' : 'Lihat Semua (14) →'}
+          {ewsShowAll ? 'Tampilkan Ringkas' : 'Lihat Semua'}
         </button>
       </div>
     </Card>
   );
 }
-
